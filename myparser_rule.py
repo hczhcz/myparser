@@ -26,6 +26,10 @@ ignore_name = ''
 buildin_name = {root_name, space_name, keyword_name}
 
 
+class MyParserException(BaseException):
+    pass
+
+
 class ASTNode(object):
     def __init__(self, newname):
         self.name = newname
@@ -147,7 +151,9 @@ class ListRule(Rule):
         if mode == 2:
             self.add_text(buf)
         if mode == 3:
-            raise '"' + syntax_ref_r + '" expected but not found'
+            raise MyParserException(
+                '"' + syntax_ref_r + '" expected but not found'
+            )
 
     def dump_list(self):
         return syntax_sep.join([
@@ -182,8 +188,9 @@ class ListRule(Rule):
                 list_match(x, line) for line in self.compiled
             }))
         else:
-            iter_helper = lambda x, l: list_match(x, l[0])\
-                or iter_helper(x, l[1:])
+            iter_helper = lambda x, l: (
+                list_match(x, l[0]) or iter_helper(x, l[1:])
+            ) if len(l) > 0 else None
 
             return lambda x: iter_helper(x, self.compiled)
 
@@ -192,7 +199,7 @@ class BuildinRule(ListRule):
     def __init__(self, newname):
         super(BuildinRule, self).__init__(newname)
         if not newname in buildin_name:
-            raise 'Bad buildin rule name'
+            raise MyParserException('Bad buildin rule name')
 
     def dump(self):
         return syntax_buildin + self.name + syntax_buildin + syntax_colon\
@@ -207,7 +214,7 @@ class RegexRule(Rule):
 
     def add(self, newregex):
         if hasattr(self, 'regex'):
-            raise 'Too much regex'
+            raise MyParserException('Too much regex')
         self.regex = newregex
 
     def dump(self):
@@ -219,6 +226,6 @@ class RegexRule(Rule):
     def compile(self, env):
         self.compiled = re.compile(self.regex)
 
-        checker = lambda x: TextASTNode(self.name, x.string()) if x else None
+        checker = lambda x: TextASTNode(self.name, x.string) if x else None
 
-        return lambda x: checker(self.compiled(x))
+        return lambda x: checker(self.compiled.match(x))

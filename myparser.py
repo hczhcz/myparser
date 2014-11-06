@@ -25,9 +25,6 @@ class MyParser(object):
             if len(result) == 1:
                 self.rule_list[-1].add(result[0])
 
-    def add_file(self, filename):
-        pass
-
     def dump(self):
         return ''.join([item.dump() for item in self.rule_list])
 
