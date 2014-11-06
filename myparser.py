@@ -32,8 +32,3 @@ class MyParser(object):
 
     def compile(self):
         pass
-
-
-test = MyParser()
-test.add_rules(open('0.txt', 'r').read().splitlines())
-print(test.dump())
