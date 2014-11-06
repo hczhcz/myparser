@@ -15,7 +15,7 @@ syntax_ref_r = '>'
 re_list = re.compile(r'(?<=^)[\w\d_ ]+(?=:)')
 re_buildin = re.compile(r'(?<=^\*\*)[\w\d_ ]+(?=\*\*:)')
 re_regex = re.compile(r'(?<=^\*)[\w\d_ ]+(?=\*:)')
-re_rule = re.compile(r'(?<=^    )(.|..|[^\/].*|\/[^\/].*|\/\/[^ ].*)')
+re_rule = re.compile(r'(?<=^    )(?!=\/\/ ).*')
 
 buildin_name = {'root', 'space', 'keyword'}
 ignore_name = ''
