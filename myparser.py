@@ -4,7 +4,7 @@ from myparser_rule import re_list, re_buildin, re_regex, re_rule
 
 class MyParser(object):
     def __init__(self):
-        self.rule_list = []
+        self.rule_list = list()
 
     def add_rules(self, rule):
         for item in rule:

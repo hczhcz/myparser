@@ -17,8 +17,11 @@ re_buildin = re.compile(r'(?<=^\*\*)[\w\d_ ]+(?=\*\*:)')
 re_regex = re.compile(r'(?<=^\*)[\w\d_ ]+(?=\*:)')
 re_rule = re.compile(r'(?<=^    )(?!=\/\/ ).*')
 
-buildin_name = {'root', 'space', 'keyword'}
+root_name = 'root'
+space_name = 'space'
+keyword_name = 'keyword'
 ignore_name = ''
+buildin_name = {root_name, space_name, keyword_name}
 
 
 class SpaceRuleItem(object):
