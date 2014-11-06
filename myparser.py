@@ -1,5 +1,6 @@
 from myparser_rule import ListRule, BuildinRule, RegexRule
 from myparser_rule import re_list, re_buildin, re_regex, re_rule
+from myparser_rule import root_name
 
 
 class MyParser(object):
@@ -31,4 +32,8 @@ class MyParser(object):
         return ''.join([item.dump() for item in self.rule_list])
 
     def compile(self):
-        pass
+        self.compiled = dict()
+        for item in self.rule_list:
+            self.compiled[item.name] = item.compile(self.compiled)
+
+        return self.compiled[root_name]
