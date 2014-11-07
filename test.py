@@ -21,17 +21,32 @@ test1.add_rules(r'''
 
     ([ \t\n]|\/\/.*$)*
 
-*id*:
+id:
+
+    <id1>
+    <id2>
+
+*num*:
+
+    [0-9]+
+
+*id1*:
 
     [a-z_][a-z0-9_]*
 
+*id2*:
+
+    @@@@
+
 **root**:
 
-    <id><id>
-    <id> <id>
+    <id> <root>
+    <id>
+    <num> <!error>
 
 '''.splitlines())
 
 print(test1.dump())
 c1 = test1.compile()
-print(c1('aaa   bbb', 0).get_full())
+print(test1.match('aaa   bbb@@@@').get_full())
+print(test1.match('1 xxx').get_full())

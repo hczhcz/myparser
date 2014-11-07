@@ -1,5 +1,6 @@
 class MyParserException(BaseException):
-    pass
+    def do_raise(self):
+        raise self
 
 
 def debug_print(x):

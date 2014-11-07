@@ -1,7 +1,7 @@
 import os
 import re
 
-from myparser_tool import MyParserException, debug_print
+from myparser_tool import MyParserException
 from myparser_tool import map_one, map_one_deep, map_all
 from myparser_ast import TextASTNode, ListASTNode
 
@@ -15,13 +15,9 @@ syntax_regex = '*'
 syntax_space = ' '
 syntax_ref_l = '<'
 syntax_ref_r = '>'
+syntax_error = '!'
 
 parser_deep = False
-
-re_list = re.compile(r'(?<=^)[\w\d_ ]+(?=:)')
-re_buildin = re.compile(r'(?<=^\*\*)[\w\d_ ]+(?=\*\*:)')
-re_regex = re.compile(r'(?<=^\*)[\w\d_ ]+(?=\*:)')
-re_rule = re.compile(r'(?<=^    )(?!\/\/ ).*')
 
 root_name = 'root'
 space_name = 'space'
@@ -65,6 +61,17 @@ class RefRuleItem(object):
         return lambda val, pos: env[self.target](val, pos)
 
 
+class ErrorRuleItem(object):
+    def __init__(self, newerror):
+        self.error = newerror
+
+    def dump(self):
+        return syntax_ref_l + self.error + syntax_ref_r
+
+    def compile(self, env):
+        return lambda val, pos: MyParserException(self.error).do_raise()
+
+
 class Rule(object):
     def __init__(self, newname):
         self.name = newname
@@ -82,7 +89,9 @@ class ListRule(Rule):
         self.rule[-1].append(TextRuleItem(newtext))
 
     def add_ref(self, newtarget):
-        if newtarget != ignore_name:
+        if newtarget.find(syntax_error) >= 0:
+            self.rule[-1].append(ErrorRuleItem(newtarget))
+        elif newtarget != ignore_name:
             self.rule[-1].append(RefRuleItem(newtarget))
 
     def add(self, newline):
