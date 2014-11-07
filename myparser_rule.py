@@ -21,7 +21,7 @@ parser_deep = False
 re_list = re.compile(r'(?<=^)[\w\d_ ]+(?=:)')
 re_buildin = re.compile(r'(?<=^\*\*)[\w\d_ ]+(?=\*\*:)')
 re_regex = re.compile(r'(?<=^\*)[\w\d_ ]+(?=\*:)')
-re_rule = re.compile(r'(?<=^    )(?!=\/\/ ).*')
+re_rule = re.compile(r'(?<=^    )(?!\/\/ ).*')
 
 root_name = 'root'
 space_name = 'space'
@@ -38,7 +38,7 @@ class SpaceRuleItem(object):
         return syntax_space
 
     def compile(self, env):
-        return lambda x: env[space_name](x)
+        return lambda val, pos: env[space_name](val, pos)
 
 
 class TextRuleItem(object):
@@ -51,7 +51,7 @@ class TextRuleItem(object):
     def compile(self, env):
         checker = lambda x: x if x == self.text else None
 
-        return lambda x: checker(env[keyword_name](x))
+        return lambda val, pos: checker(env[keyword_name](val, pos))
 
 
 class RefRuleItem(object):
@@ -62,7 +62,7 @@ class RefRuleItem(object):
         return syntax_ref_l + self.target + syntax_ref_r
 
     def compile(self, env):
-        return lambda x: env[self.target](x)
+        return lambda val, pos: env[self.target](val, pos)
 
 
 class Rule(object):
@@ -146,24 +146,21 @@ class ListRule(Rule):
             ] for line in self.rule
         ]
 
-        list_checker = lambda x: ListASTNode(self.name, x)\
-            if not None in x else None
-        list_match = lambda x, l: list_checker([
-            item(x) for item in l
-        ])
+        list_match = lambda val, pos, l: map_all(
+            l, pos,
+            lambda x, xpos: x(val, xpos),
+            lambda x, xpos: xpos + x.len(),
+            lambda x: ListASTNode(self.name, x)
+        )
 
         if parser_deep:
-            all_checker = lambda x: x[0] if len(x) == 1 else None
-
-            return lambda x: all_checker(list({
-                list_match(x, line) for line in self.compiled
-            }))
+            return lambda val, pos: map_one_deep(
+                self.compiled, lambda x: list_match(val, pos, x)
+            )
         else:
-            iter_helper = lambda x, l: (
-                list_match(x, l[0]) or iter_helper(x, l[1:])
-            ) if len(l) > 0 else None
-
-            return lambda x: iter_helper(x, self.compiled)
+            return lambda val, pos: map_one(
+                self.compiled, lambda x: list_match(val, pos, x)
+            )
 
 
 class BuildinRule(ListRule):
@@ -197,6 +194,8 @@ class RegexRule(Rule):
     def compile(self, env):
         self.compiled = re.compile(self.regex)
 
-        checker = lambda x: TextASTNode(self.name, x.string) if x else None
+        checker = lambda x: TextASTNode(
+            self.name, x.string[x.start():x.end()]
+        ) if x else None
 
-        return lambda x: checker(self.compiled.match(x))
+        return lambda val, pos: checker(self.compiled.match(val, pos))
