@@ -1,6 +1,10 @@
 import os
 import re
 
+from myparser_tool import MyParserException, debug_print
+from myparser_tool import map_one, map_one_deep, map_all
+from myparser_ast import TextASTNode, ListASTNode
+
 syntax_indent = '    '
 syntax_return = os.linesep + os.linesep
 syntax_sep = os.linesep
@@ -24,10 +28,6 @@ space_name = 'space'
 keyword_name = 'keyword'
 ignore_name = ''
 buildin_name = {root_name, space_name, keyword_name}
-
-
-class MyParserException(BaseException):
-    pass
 
 
 class SpaceRuleItem(object):
