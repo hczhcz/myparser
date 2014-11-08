@@ -1,7 +1,7 @@
 import re
 
 from myparser_tool import MyParserException
-from myparser_rule import ListRule, BuiltinRule, RegexRule
+from myparser_rule import RuleList, RuleBuiltin, RuleRegex
 from myparser_rule import root_name
 
 re_list = re.compile(r'(?<=^)[\w\d_ ]+(?=:)')
@@ -18,19 +18,19 @@ class MyParser(object):
         for item in rule:
             result = re_list.search(item)
             if result:
-                self.rule_list.append(ListRule(
+                self.rule_list.append(RuleList(
                     result.string[result.start():result.end()]
                 ))
 
             result = re_builtin.search(item)
             if result:
-                self.rule_list.append(BuiltinRule(
+                self.rule_list.append(RuleBuiltin(
                     result.string[result.start():result.end()]
                 ))
 
             result = re_regex.search(item)
             if result:
-                self.rule_list.append(RegexRule(
+                self.rule_list.append(RuleRegex(
                     result.string[result.start():result.end()]
                 ))
 

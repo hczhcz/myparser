@@ -3,7 +3,7 @@ import re
 
 from myparser_tool import MyParserException
 from myparser_tool import map_one, map_one_deep, map_all
-from myparser_ast import TextASTNode, ListASTNode
+from myparser_ast import NodeText, NodeList
 
 syntax_indent = '    '
 syntax_return = os.linesep + os.linesep
@@ -26,7 +26,7 @@ ignore_name = ''
 builtin_name = {root_name, space_name, keyword_name}
 
 
-class SpaceRuleItem(object):
+class RuleItemSpace(object):
     def __init__(self):
         pass
 
@@ -37,7 +37,7 @@ class SpaceRuleItem(object):
         return lambda val, pos: env[space_name](val, pos)
 
 
-class TextRuleItem(object):
+class RuleItemKeyword(object):
     def __init__(self, newtext):
         self.text = newtext
 
@@ -50,7 +50,7 @@ class TextRuleItem(object):
         return lambda val, pos: checker(env[keyword_name](val, pos))
 
 
-class RefRuleItem(object):
+class RuleItemRef(object):
     def __init__(self, newtarget):
         self.target = newtarget
 
@@ -61,7 +61,7 @@ class RefRuleItem(object):
         return lambda val, pos: env[self.target](val, pos)
 
 
-class ErrorRuleItem(object):
+class RuleItemError(object):
     def __init__(self, newerror):
         self.error = newerror
 
@@ -77,22 +77,22 @@ class Rule(object):
         self.name = newname
 
 
-class ListRule(Rule):
+class RuleList(Rule):
     def __init__(self, newname):
-        super(ListRule, self).__init__(newname)
+        super(RuleList, self).__init__(newname)
         self.rule = list()
 
     def add_space(self):
-        self.rule[-1].append(SpaceRuleItem())
+        self.rule[-1].append(RuleItemSpace())
 
     def add_text(self, newtext):
-        self.rule[-1].append(TextRuleItem(newtext))
+        self.rule[-1].append(RuleItemKeyword(newtext))
 
     def add_ref(self, newtarget):
         if newtarget.find(syntax_error) >= 0:
-            self.rule[-1].append(ErrorRuleItem(newtarget))
+            self.rule[-1].append(RuleItemError(newtarget))
         elif newtarget != ignore_name:
-            self.rule[-1].append(RefRuleItem(newtarget))
+            self.rule[-1].append(RuleItemRef(newtarget))
 
     def add(self, newline):
         self.rule.append(list())
@@ -159,7 +159,7 @@ class ListRule(Rule):
             l, pos,
             lambda x, xpos: x(val, xpos),
             lambda x, xpos: xpos + x.len(),
-            lambda x: ListASTNode(self.name, x)
+            lambda x: NodeList(self.name, x)
         )
 
         if parser_deep:
@@ -172,9 +172,9 @@ class ListRule(Rule):
             )
 
 
-class BuiltinRule(ListRule):
+class RuleBuiltin(RuleList):
     def __init__(self, newname):
-        super(BuiltinRule, self).__init__(newname)
+        super(RuleBuiltin, self).__init__(newname)
         if not newname in builtin_name:
             raise MyParserException('Bad builtin rule name')
 
@@ -185,9 +185,9 @@ class BuiltinRule(ListRule):
             + syntax_return
 
 
-class RegexRule(Rule):
+class RuleRegex(Rule):
     def __init__(self, newname):
-        super(RegexRule, self).__init__(newname)
+        super(RuleRegex, self).__init__(newname)
 
     def add(self, newregex):
         if hasattr(self, 'regex'):
@@ -203,7 +203,7 @@ class RegexRule(Rule):
     def compile(self, env):
         self.compiled = re.compile(self.regex)
 
-        checker = lambda x: TextASTNode(
+        checker = lambda x: NodeText(
             self.name, x.string[x.start():x.end()]
         ) if x else None
 

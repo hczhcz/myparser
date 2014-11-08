@@ -7,14 +7,14 @@ rep_l = '{'
 rep_r = '}'
 
 
-class ASTNode(object):
+class Node(object):
     def __init__(self, newname):
         self.name = newname
 
 
-class TextASTNode(ASTNode):
+class NodeText(Node):
     def __init__(self, newname, newtext):
-        super(TextASTNode, self).__init__(newname)
+        super(NodeText, self).__init__(newname)
         self.text = newtext
 
     def get_text(self):
@@ -27,9 +27,9 @@ class TextASTNode(ASTNode):
         return len(self.text)
 
 
-class ListASTNode(ASTNode):
+class NodeList(Node):
     def __init__(self, newname, newlist):
-        super(ListASTNode, self).__init__(newname)
+        super(NodeList, self).__init__(newname)
         self.list = newlist
 
     def get_text(self):
