@@ -1,6 +1,7 @@
 import os
 import re
 
+from myparser_tool import char_error, char_maybe, char_any0, char_any1
 from myparser_tool import MyParserException
 from myparser_tool import map_one, map_one_deep, map_all
 from myparser_ast import NodeText, NodeList
@@ -9,13 +10,16 @@ syntax_indent = '    '
 syntax_return = os.linesep + os.linesep
 syntax_sep = os.linesep
 syntax_colon = ':'
+
 syntax_list = ''
 syntax_builtin = '**'
 syntax_regex = '*'
+
 syntax_space = ' '
 syntax_ref_l = '<'
 syntax_ref_r = '>'
-syntax_error = '!'
+
+re_name = re.compile(r'[\w ]+')
 
 parser_deep = False
 
@@ -52,10 +56,15 @@ class RuleItemKeyword(object):
 
 class RuleItemRef(object):
     def __init__(self, newtarget):
+        if re_name.match(newtarget).end() != len(newtarget):
+            raise MyParserException('Bad item reference')
         self.target = newtarget
 
     def dump(self):
         return syntax_ref_l + self.target + syntax_ref_r
+
+    def dump_tag(self, tag):
+        return syntax_ref_l + tag + self.target + syntax_ref_r
 
     def compile(self, env):
         return lambda val, pos: env[self.target](val, pos)
@@ -67,6 +76,9 @@ class RuleItemError(object):
 
     def dump(self):
         return syntax_ref_l + self.error + syntax_ref_r
+
+    def dump_tag(self, tag):
+        return syntax_ref_l + tag + self.error + syntax_ref_r
 
     def compile(self, env):
         return lambda val, pos: MyParserException(self.error).do_raise()
@@ -83,16 +95,18 @@ class RuleList(Rule):
         self.rule = list()
 
     def add_space(self):
-        self.rule[-1].append(RuleItemSpace())
+        self.rule[-1].append((None, RuleItemSpace()))
 
     def add_text(self, newtext):
-        self.rule[-1].append(RuleItemKeyword(newtext))
+        self.rule[-1].append((None, RuleItemKeyword(newtext)))
 
     def add_ref(self, newtarget):
-        if newtarget.find(syntax_error) >= 0:
-            self.rule[-1].append(RuleItemError(newtarget))
+        if newtarget[0] == char_error:
+            self.rule[-1].append((newtarget[0], RuleItemError(newtarget[1:])))
+        elif newtarget[0] in {char_maybe, char_any0, char_any1}:
+            self.rule[-1].append((newtarget[0], RuleItemRef(newtarget[1:])))
         elif newtarget != ignore_name:
-            self.rule[-1].append(RuleItemRef(newtarget))
+            self.rule[-1].append((None, RuleItemRef(newtarget)))
 
     def add(self, newline):
         self.rule.append(list())
@@ -138,7 +152,9 @@ class RuleList(Rule):
     def dump_list(self):
         return syntax_sep.join([
             syntax_indent + ''.join([
-                item.dump() for item in line
+                (
+                    item[1].dump_tag(item[0]) if item[0] else item[1].dump()
+                ) for item in line
             ]) for line in self.rule
         ])
 
@@ -151,7 +167,7 @@ class RuleList(Rule):
     def compile(self, env):
         self.compiled = [
             [
-                item.compile(env) for item in line
+                (item[0], item[1].compile(env)) for item in line
             ] for line in self.rule
         ]
 

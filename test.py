@@ -26,6 +26,10 @@ id:
     <id1>
     <id2>
 
+*bang*:
+
+    !
+
 *num*:
 
     [0-9]+
@@ -42,11 +46,12 @@ id:
 
     <id> <root>
     <id>
+    <bang><+bang> <root>
     <num> <!error>
 
 '''.splitlines())
 
 print(test1.dump())
 c1 = test1.compile()
-print(test1.match('aaa   bbb@@@@').get_full())
-print(test1.match('1 xxx').get_full())
+print(test1.match('!!aaa   bbb@@@@').get_full())
+# print(test1.match('1 xxx').get_full())
