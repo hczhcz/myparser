@@ -10,7 +10,7 @@ syntax_return = os.linesep + os.linesep
 syntax_sep = os.linesep
 syntax_colon = ':'
 syntax_list = ''
-syntax_buildin = '**'
+syntax_builtin = '**'
 syntax_regex = '*'
 syntax_space = ' '
 syntax_ref_l = '<'
@@ -23,7 +23,7 @@ root_name = 'root'
 space_name = 'space'
 keyword_name = 'keyword'
 ignore_name = ''
-buildin_name = {root_name, space_name, keyword_name}
+builtin_name = {root_name, space_name, keyword_name}
 
 
 class SpaceRuleItem(object):
@@ -172,14 +172,14 @@ class ListRule(Rule):
             )
 
 
-class BuildinRule(ListRule):
+class BuiltinRule(ListRule):
     def __init__(self, newname):
-        super(BuildinRule, self).__init__(newname)
-        if not newname in buildin_name:
-            raise MyParserException('Bad buildin rule name')
+        super(BuiltinRule, self).__init__(newname)
+        if not newname in builtin_name:
+            raise MyParserException('Bad builtin rule name')
 
     def dump(self):
-        return syntax_buildin + self.name + syntax_buildin + syntax_colon\
+        return syntax_builtin + self.name + syntax_builtin + syntax_colon\
             + syntax_return\
             + self.dump_list()\
             + syntax_return
