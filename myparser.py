@@ -4,9 +4,9 @@ from myparser_tool import MyParserException
 from myparser_rule import RuleList, RuleBuiltin, RuleRegex
 from myparser_rule import root_name
 
-re_list = re.compile(r'(?<=^)[\w\d_ ]+(?=:)')
-re_builtin = re.compile(r'(?<=^\*\*)[\w\d_ ]+(?=\*\*:)')
-re_regex = re.compile(r'(?<=^\*)[\w\d_ ]+(?=\*:)')
+re_list = re.compile(r'(?<=^)[\w ]+(?=:)')
+re_builtin = re.compile(r'(?<=^\*\*)[\w ]+(?=\*\*:)')
+re_regex = re.compile(r'(?<=^\*)[\w ]+(?=\*:)')
 re_rule = re.compile(r'(?<=^    )(?!\/\/ ).*')
 
 
