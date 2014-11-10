@@ -47,15 +47,6 @@ public:
     }
 };
 
-// need specialization
-template <class N, class TX = void>
-class RuleDef: public RuleNamed<N> {
-public:
-    static const Node *parse(InputType &input, const InputType &end) {
-        return TX::need_specialization();
-    }
-};
-
 //////// Named ////////
 
 template <class N, class... RL>

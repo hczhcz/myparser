@@ -1,5 +1,5 @@
 import myparser
-from myparser_cpp import cplusplus_dump
+from myparser_cpp import cplusplus_dump, cplusplus_gen
 
 test = myparser.MyParser()
 test.add_rules(open('0.txt', 'r').read().splitlines())
@@ -58,5 +58,10 @@ print(test1.match('!!aaa   bbb@@@@').get_full())
 # print(test1.match('1 xxx').get_full())
 
 print('========')
-print(test1.xdump(cplusplus_dump))
+print(cplusplus_gen(
+    'mylang',
+    test1.xdump(cplusplus_dump),
+    'parser/',
+    'MYLANG_SYNTAX_HPP'
+))
 print('========')
