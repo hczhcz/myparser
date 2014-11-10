@@ -37,6 +37,9 @@ class RuleItemSpace(object):
     def dump(self):
         return syntax_space
 
+    def xdump(self, template):
+        return template['space']()
+
     def compile(self, env):
         return lambda val, pos: env[space_name](val, pos)
 
@@ -47,6 +50,9 @@ class RuleItemKeyword(object):
 
     def dump(self):
         return self.text
+
+    def xdump(self, template):
+        return template['keyword'](self.text)
 
     def compile(self, env):
         checker = lambda x: x if x == self.text else None
@@ -66,6 +72,12 @@ class RuleItemRef(object):
     def dump_tag(self, tag):
         return syntax_ref_l + tag + self.target + syntax_ref_r
 
+    def xdump(self, template):
+        return template['ref'](self.target)
+
+    def xdump_tag(self, template, tag):
+        return template['ref' + tag](self.target)
+
     def compile(self, env):
         return lambda val, pos: env[self.target](val, pos)
 
@@ -74,11 +86,11 @@ class RuleItemError(object):
     def __init__(self, newerror):
         self.error = newerror
 
-    def dump(self):
-        return syntax_ref_l + self.error + syntax_ref_r
-
     def dump_tag(self, tag):
         return syntax_ref_l + tag + self.error + syntax_ref_r
+
+    def xdump_tag(self, template, tag):
+        return template['error'](self.error)
 
     def compile(self, env):
         return lambda val, pos: MyParserException(self.error).do_raise()
@@ -153,7 +165,8 @@ class RuleList(Rule):
         return syntax_sep.join([
             syntax_indent + ''.join([
                 (
-                    item[1].dump_tag(item[0]) if item[0] else item[1].dump()
+                    item[1].dump_tag(item[0])
+                    if item[0] else item[1].dump()
                 ) for item in line
             ]) for line in self.rule
         ])
@@ -163,6 +176,16 @@ class RuleList(Rule):
             + syntax_return\
             + self.dump_list()\
             + syntax_return
+
+    def xdump(self, template):
+        return template['list'](self.name, [
+            template['line']([
+                (
+                    item[1].xdump_tag(template, item[0])
+                    if item[0] else item[1].xdump(template)
+                ) for item in line
+            ]) for line in self.rule
+        ])
 
     def compile(self, env):
         self.compiled = [
@@ -215,6 +238,9 @@ class RuleRegex(Rule):
                             + syntax_return\
                             + syntax_indent + self.regex\
                             + syntax_return
+
+    def xdump(self, template):
+        return template['regex'](self.name, self.regex)
 
     def compile(self, env):
         self.compiled = re.compile(self.regex)
