@@ -10,9 +10,9 @@ def str_gen(value):
 
 
 indent0 = os.linesep
-indent1 = os.linesep + '    '
+indent1 = indent0 + '    '
 indent1c = ',' + indent1
-indent2 = os.linesep + '        '
+indent2 = indent1 + '        '
 indent2c = ',' + indent2
 
 cplusplus_dump = {
@@ -28,17 +28,17 @@ cplusplus_dump = {
     ),
 
     'list': lambda n, l: (
-        'template<>' + os.linesep
-        + 'class RuleDef<' + str_gen(n) + '>:' + os.linesep
+        'template<>' + indent0
+        + 'class RuleDef<' + str_gen(n) + '>:' + indent0
         + 'public RuleList<' + str_gen(n)
         + indent1c + indent1c.join(l) + indent0
-        + '> {};' + os.linesep
+        + '> {};' + indent0
     ),
     'regex': lambda n, x: (
-        'template<>' + os.linesep
-        + 'class RuleDef<' + str_gen(n) + '>:' + os.linesep
+        'template<>' + indent0
+        + 'class RuleDef<' + str_gen(n) + '>:' + indent0
         + 'public RuleRegex<' + str_gen(n)
         + indent1c + str_gen(x) + indent0
-        + '> {};' + os.linesep
+        + '> {};' + indent0
     )
 }

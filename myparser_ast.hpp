@@ -1,5 +1,5 @@
-#ifndef MP_AST_H
-#define MP_AST_H
+#ifndef MYPARSER_AST_HPP
+#define MYPARSER_AST_HPP
 
 #include <vector>
 #include <string>

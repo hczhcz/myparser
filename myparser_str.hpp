@@ -1,5 +1,5 @@
-#ifndef MP_UTIL_H
-#define MP_UTIL_H
+#ifndef MYPARSER_STR_HPP
+#define MYPARSER_STR_HPP
 
 #include <string>
 

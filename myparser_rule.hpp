@@ -1,5 +1,5 @@
-#ifndef MP_SYNTAX_H
-#define MP_SYNTAX_H
+#ifndef MYPARSER_RULE_HPP
+#define MYPARSER_RULE_HPP
 
 #include <limits>
 #include <string>
