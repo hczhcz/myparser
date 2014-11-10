@@ -1,3 +1,4 @@
+import os
 import re
 
 from myparser_tool import MyParserException
@@ -44,7 +45,14 @@ class MyParser(object):
                     )
 
     def dump(self):
-        return ''.join([item.dump() for item in self.rule_list])
+        return os.linesep.join([
+            item.dump() for item in self.rule_list
+        ])
+
+    def xdump(self, template):
+        return os.linesep.join([
+            item.xdump(template) for item in self.rule_list
+        ])
 
     def compile(self):
         self.compiled = dict()

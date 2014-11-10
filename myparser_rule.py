@@ -7,7 +7,7 @@ from myparser_tool import map_one, map_one_deep, map_all
 from myparser_ast import NodeText, NodeList
 
 syntax_indent = '    '
-syntax_return = os.linesep + os.linesep
+syntax_return = os.linesep
 syntax_sep = os.linesep
 syntax_colon = ':'
 
