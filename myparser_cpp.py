@@ -4,15 +4,15 @@ from myparser_tool import char_maybe, char_any0, char_any1
 
 
 def str_gen(value):
-    result = repr(value)[1:-1]
+    result = value.encode('string_escape').replace('"', r'\"')
 
-    return 'MP_STR("' + result + '", ' + str(len(result)) + ')'
+    return 'MP_STR("' + result + '", ' + str(len(value)) + ')'
 
 
 indent0 = os.linesep
 indent1 = indent0 + '    '
 indent1c = ',' + indent1
-indent2 = indent1 + '        '
+indent2 = indent1 + '    '
 indent2c = ',' + indent2
 
 cplusplus_dump = {
@@ -44,13 +44,22 @@ cplusplus_dump = {
 }
 
 cplusplus_class_rd = '''// need specialization
-template <class N, class TX = void>
+template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
     static const Node *parse(InputType &input, const InputType &end) {
-        return TX::need_specialization();
+        return N::need_specialization();
     }
 };
+
+template <class TAG = TagNormal>
+using RuleItemSpace = RuleItemSpace<RuleDef, TAG>;
+
+template <class KW, class TAG = TagNormal>
+using RuleItemKeyword = RuleItemKeyword<RuleDef, KW, TAG>;
+
+template <class N, class TAG = TagNormal>
+using RuleItemRef = RuleItemRef<RuleDef, N, TAG>;
 '''
 
 
@@ -62,6 +71,8 @@ def cplusplus_gen(namespace, content, mppath, guard):
         + '#include "' + mppath + 'myparser_rule.hpp"' + indent0
         + indent0
         + 'namespace ' + namespace + '{' + indent0
+        + indent0
+        + 'using namespace myparser;'
         + indent0
         + cplusplus_class_rd
         + indent0

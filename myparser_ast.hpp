@@ -49,7 +49,7 @@ public:
         }
     }
 
-    inline void putChild(const Node *value) {
+    inline void putChild(Node *value) {
         children.push_back(value);
     }
 

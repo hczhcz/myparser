@@ -133,21 +133,21 @@ public:
 
 //////// Cell ////////
 
-template <class TAG = TagNormal>
+template <template <class N> class RD, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
     static const Node *parse(InputType &input, const InputType &end) {
-        return RuleDef<BuiltinSpace>::parse(input, end);
+        return RD<BuiltinSpace>::parse(input, end);
     }
 };
 
-template <class KW, class TAG = TagNormal>
+template <template <class N> class RD, class KW, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
     static const Node *parse(InputType &input, const InputType &end) {
         static const std::string keyword = KW::getStr();
 
-        const Node *result = RuleDef<BuiltinKeyword>::parse(input, end);
+        const Node *result = RD<BuiltinKeyword>::parse(input, end);
 
         if (result->getFullText() == keyword) {
             return result;
@@ -159,11 +159,11 @@ public:
     }
 };
 
-template <class N, class TAG = TagNormal>
+template <template <class N> class RD, class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
     static const Node *parse(InputType &input, const InputType &end) {
-        return RuleDef<N>::parse(input, end);
+        return RD<N>::parse(input, end);
     }
 };
 

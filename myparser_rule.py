@@ -113,12 +113,17 @@ class RuleList(Rule):
         self.rule[-1].append((None, RuleItemKeyword(newtext)))
 
     def add_ref(self, newtarget):
-        if newtarget[0] == char_error:
-            self.rule[-1].append((newtarget[0], RuleItemError(newtarget[1:])))
-        elif newtarget[0] in {char_maybe, char_any0, char_any1}:
-            self.rule[-1].append((newtarget[0], RuleItemRef(newtarget[1:])))
-        elif newtarget != ignore_name:
-            self.rule[-1].append((None, RuleItemRef(newtarget)))
+        if newtarget != ignore_name:
+            if newtarget[0] == char_error:
+                self.rule[-1].append(
+                    (newtarget[0], RuleItemError(newtarget[1:]))
+                )
+            elif newtarget[0] in {char_maybe, char_any0, char_any1}:
+                self.rule[-1].append(
+                    (newtarget[0], RuleItemRef(newtarget[1:]))
+                )
+            else:
+                self.rule[-1].append((None, RuleItemRef(newtarget)))
 
     def add(self, newline):
         self.rule.append(list())
