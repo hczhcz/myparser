@@ -1,4 +1,5 @@
 import myparser
+from myparser_cpp import cplusplus_dump
 
 test = myparser.MyParser()
 test.add_rules(open('0.txt', 'r').read().splitlines())
@@ -55,3 +56,7 @@ print(test1.dump())
 c1 = test1.compile()
 print(test1.match('!!aaa   bbb@@@@').get_full())
 # print(test1.match('1 xxx').get_full())
+
+print('========')
+print(test1.xdump(cplusplus_dump))
+print('========')
