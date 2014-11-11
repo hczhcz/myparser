@@ -47,7 +47,7 @@ cplusplus_class_rd = '''// need specialization
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         return N::need_specialization();
     }
 };

@@ -10,8 +10,6 @@
 
 namespace myparser {
 
-using InputType = std::string::iterator;
-
 using BuiltinRoot = MP_STR("root", 4);
 using BuiltinSpace = MP_STR("space", 5);
 using BuiltinKeyword = MP_STR("keyword", 7);
@@ -52,18 +50,20 @@ public:
 template <class N, class... RL>
 class RuleList: public RuleNamed<N> {
 public:
-    static const RuleList<N, RL...> instance;
+    using SelfType = RuleList<N, RL...>;
+
+    static const SelfType instance;
 
 private:
     template <class R, class... Rx>
     static inline const Node *runRule(
-        InputType &input, const InputType &end
+        Input &input, const Input &end
     ) {
-        InputType input_new = input;
+        Input input_new = input;
 
         using Member =
             typename R
-            ::template Helper<RuleList<N, RL...>>;
+            ::template Helper<SelfType>;
 
         Node *current = Member::parse(input_new, end);
 
@@ -78,13 +78,13 @@ private:
 
     template <std::nullptr_t P = nullptr> // iteration finished
     static inline const Node *runRule(
-        InputType &input, const InputType &end
+        Input &input, const Input &end
     ) {
-        return nullptr;
+        return new NodeErrorNativeTyped<SelfType, MP_STR("Nothing matched", 15)>();
     }
 
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         return runRule<RL...>(input, end);
     }
 };
@@ -95,20 +95,20 @@ using RuleBuiltin = RuleList<N, RL...>;
 template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
 public:
-    static const RuleRegex<N, RX> instance;
+    using SelfType = RuleRegex<N, RX>;
 
-    using ResultType = NodeTextTyped<RuleRegex<N, RX>>;
+    static const SelfType instance;
 
 private:
-    static inline const ResultType *runRegex(
-        InputType &input, const InputType &end
+    static inline const Node *runRegex(
+        Input &input, const Input &end
     ) {
         static const std::regex regex(
             RX::getStr(),
             std::regex_constants::extended
         );
 
-        std::match_results<InputType> mdata;
+        std::match_results<Input> mdata;
 
         if (
             regex_search(
@@ -119,14 +119,14 @@ private:
             auto str = mdata.str();
             input += str.size();
 
-            return new ResultType(str);
+            return new NodeTextTyped<SelfType>(input, str);
         } else {
-            return nullptr;
+            return new NodeErrorNativeTyped<SelfType, MP_STR("Regex not matched", 17)>();
         }
     }
 
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         return runRegex(input, end);
     }
 };
@@ -136,7 +136,7 @@ public:
 template <template <class N> class RD, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         return RD<BuiltinSpace>::parse(input, end);
     }
 };
@@ -144,7 +144,7 @@ public:
 template <template <class N> class RD, class KW, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         static const std::string keyword = KW::getStr();
 
         const Node *result = RD<BuiltinKeyword>::parse(input, end);
@@ -152,9 +152,7 @@ public:
         if (result->getFullText() == keyword) {
             return result;
         } else {
-            delete result;
-
-            return nullptr;
+            return new NodeErrorWrap<>(input, result);
         }
     }
 };
@@ -162,7 +160,7 @@ public:
 template <template <class N> class RD, class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         return RD<N>::parse(input, end);
     }
 };
@@ -170,12 +168,10 @@ public:
 template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
-    static const Node *parse(InputType &input, const InputType &end) {
+    static const Node *parse(Input &input, const Input &end) {
         static const std::string error = E::getStr();
 
-        // throw E; // TODO: exception class
-
-        return nullptr;
+        return new NodeErrorNative<E>(input);
     }
 };
 
@@ -184,13 +180,10 @@ class RuleLine {
 public:
     template <class LST>
     class Helper {
-    public:
-        using ResultType = NodeListTyped<LST>;
-
     private:
         template <class R, class... Rx>
         static inline bool runRule(
-            ResultType *&result, InputType &input, const InputType &end
+            NodeListTyped<LST> *&result, Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
                 Node *current = R::parse(input, end);
@@ -211,21 +204,19 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static inline bool runRule(
-            ResultType *&result, InputType &input, const InputType &end
+            NodeListTyped<LST> *&result, Input &input, const Input &end
         ) {
             return true;
         }
 
     public:
-        static const Node *parse(InputType &input, const InputType &end) {
-            ResultType *result = new ResultType();
+        static const Node *parse(Input &input, const Input &end) {
+            NodeListTyped<LST> *result = new NodeListTyped<LST>(input);
 
             if (runRule<RL...>(result, input, end)) {
                 return result;
             } else {
-                delete result;
-
-                return nullptr;
+                return new NodeErrorWrapTyped<LST>(result);
             }
         }
     };
