@@ -14,6 +14,11 @@ using BuiltinRoot = MP_STR("root", 4);
 using BuiltinSpace = MP_STR("space", 5);
 using BuiltinKeyword = MP_STR("keyword", 7);
 
+using ErrorList = MP_STR("Nothing matched", 15);
+using ErrorRegex = MP_STR("Regex not matched", 17);
+using ErrorKeyword = MP_STR("Bad keyword", 11);
+using ErrorLine = MP_STR("Longest bad match", 17);
+
 template <size_t L, size_t M>
 class Tag {
 public:
@@ -72,7 +77,18 @@ private:
 
             return current;
         } else {
-            return runRule<Rx...>(input, end);
+            Node *later = runRule<Rx...>(input, end);
+
+            // select the best one
+            if (later || later->getPos() > current->getPos()) {
+                delete current;
+
+                return later;
+            } else {
+                delete later;
+
+                return current;
+            }
         }
     }
 
@@ -80,7 +96,7 @@ private:
     static inline const Node *runRule(
         Input &input, const Input &end
     ) {
-        return new NodeErrorNativeTyped<SelfType, MP_STR("Nothing matched", 15)>();
+        return new NodeErrorNativeTyped<SelfType, ErrorList>(input);
     }
 
 public:
@@ -121,7 +137,7 @@ private:
 
             return new NodeTextTyped<SelfType>(input, str);
         } else {
-            return new NodeErrorNativeTyped<SelfType, MP_STR("Regex not matched", 17)>();
+            return new NodeErrorNativeTyped<SelfType, ErrorRegex>(input);
         }
     }
 
@@ -149,10 +165,10 @@ public:
 
         const Node *result = RD<BuiltinKeyword>::parse(input, end);
 
-        if (result->getFullText() == keyword) {
+        if (result && result->getFullText() == keyword) {
             return result;
         } else {
-            return new NodeErrorWrap<>(input, result);
+            return new NodeErrorWrap<ErrorKeyword>(input, result);
         }
     }
 };
@@ -188,9 +204,8 @@ public:
             for (size_t i = 0; i < R::most; ++i) {
                 Node *current = R::parse(input, end);
 
-                if (current) {
-                    result->putChild(current);
-                } else {
+                result->putChild(current);
+                if (!current) {
                     if (i < R::least) {
                         return false;
                     } else {
@@ -216,7 +231,7 @@ public:
             if (runRule<RL...>(result, input, end)) {
                 return result;
             } else {
-                return new NodeErrorWrapTyped<LST>(result);
+                return new NodeErrorWrapTyped<LST, ErrorLine>(input, result);
             }
         }
     };

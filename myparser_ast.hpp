@@ -22,7 +22,7 @@ class NodeError;
 template <class E>
 class NodeErrorNative;
 
-template <class TX = void>
+template <class E>
 class NodeErrorWrap;
 
 // forward declaration finished
@@ -33,6 +33,8 @@ using Input = std::string::iterator;
 class Node {
 private:
     const Input pos;
+
+    inline Node() = delete;
 
 public:
     inline Node(const Input &input): pos(input) {}
@@ -141,6 +143,11 @@ class NodeErrorNative: public NodeError<> {
 public:
     using ErrorType = E;
 
+    inline NodeErrorNative(const Input &input):
+        NodeError(input) {}
+
+    virtual ~NodeErrorNative() {}
+
     virtual const std::string getFullText() const {
         return "";
     }
@@ -149,14 +156,14 @@ public:
     //       static const std::string error = E::getStr();
 };
 
-template <class TX> // actually not a template
-class NodeErrorWrap: public NodeError<> {
+template <class E>
+class NodeErrorWrap: public NodeErrorNative<E> {
 private:
     const Node *child;
 
 public:
     inline NodeErrorWrap(const Input &input, const Node *value):
-        NodeError(input), child(value) {}
+        NodeErrorNative<E>(input), child(value) {}
 
     virtual ~NodeErrorWrap() {
         delete child;
@@ -206,8 +213,8 @@ using NodeTextTyped = RuleTyped<NT, NodeText<>>;
 template <class NT, class E>
 using NodeErrorNativeTyped = RuleTyped<NT, NodeErrorNative<E>>;
 
-template <class NT>
-using NodeErrorWrapTyped = RuleTyped<NT, NodeErrorWrap<>>;
+template <class NT, class E>
+using NodeErrorWrapTyped = RuleTyped<NT, NodeErrorWrap<E>>;
 
 }
 
