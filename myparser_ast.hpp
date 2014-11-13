@@ -47,6 +47,8 @@ public:
 
     virtual const std::string getFullText() const = 0;
 
+    virtual const std::string getTree(size_t indent = 0) const = 0;
+
     inline const Input &getPos() const {
         return pos;
     }
@@ -91,6 +93,20 @@ public:
         return result;
     }
 
+    virtual const std::string getTree(size_t indent = 0) const {
+        std::string result = getRule()->getName();
+
+        for (Node *child: children) {
+            result += '\n';
+            for (size_t i = 0; i < indent; ++i) {
+                result += "    ";
+            }
+            result += child->getTree(indent + 1);
+        }
+
+        return result;
+    }
+
     inline const std::vector<const Node *> &getChildren() const {
         return children;
     }
@@ -115,6 +131,10 @@ public:
         return text;
     }
 
+    virtual const std::string getTree(size_t indent = 0) const {
+        return getRule()->getName() + " - " + text;
+    }
+
     inline const std::string &getText() const {
         return text;
     }
@@ -135,6 +155,10 @@ public:
         return true;
     }
 
+    virtual RulePtr getRule() const {
+        return nullptr; // TODO: really?
+    }
+
     // TODO: virtual function: getErrorMessage()
 };
 
@@ -152,8 +176,11 @@ public:
         return "";
     }
 
-    // TODO: function getErrorMessage():
-    //       static const std::string error = E::getStr();
+    virtual const std::string getTree(size_t indent = 0) const {
+        static const std::string error = E::getStr();
+
+        return getRule()->getName() + " - " + error;
+    }
 };
 
 template <class E>
@@ -167,10 +194,6 @@ public:
 
     virtual ~NodeErrorWrap() {
         delete child;
-    }
-
-    virtual RulePtr getRule() const {
-        return nullptr; // TODO: really?
     }
 
     virtual const std::string getFullText() const {
