@@ -4,7 +4,7 @@ import re
 from myparser_tool import char_error, char_maybe, char_any0, char_any1
 from myparser_tool import MyParserException
 from myparser_tool import map_one, map_one_deep, map_all
-from myparser_ast import NodeText, NodeList
+from myparser_ast import NodeList, NodeText
 
 syntax_indent = '    '
 syntax_return = os.linesep

@@ -2,29 +2,12 @@ import os
 
 rep_indent = '    '
 rep_sep = os.linesep
-rep_colon = ': '
-rep_l = '{'
-rep_r = '}'
+rep_colon = ' - '
 
 
 class Node(object):
     def __init__(self, newname):
         self.name = newname
-
-
-class NodeText(Node):
-    def __init__(self, newname, newtext):
-        super(NodeText, self).__init__(newname)
-        self.text = newtext
-
-    def get_text(self):
-        return self.text
-
-    def get_full(self, indent=0):
-        return self.name + rep_colon + self.text  # TODO: improve
-
-    def len(self):
-        return len(self.text)
 
 
 class NodeList(Node):
@@ -36,11 +19,26 @@ class NodeList(Node):
         return ''.join([item.get_text() for item in self.list])
 
     def get_full(self, indent=0):
-        return self.name + rep_colon + rep_l + ''.join([
+        return self.name + ''.join([
             rep_sep + rep_indent * (indent + 1) + (
                 item.get_full(indent + 1)
             ) for item in self.list
-        ]) + rep_sep + rep_indent * indent + rep_r
+        ])
 
     def len(self):
         return sum([item.len() for item in self.list])
+
+
+class NodeText(Node):
+    def __init__(self, newname, newtext):
+        super(NodeText, self).__init__(newname)
+        self.text = newtext
+
+    def get_text(self):
+        return self.text
+
+    def get_full(self, indent=0):
+        return self.name + rep_colon + self.text.encode('string_escape')
+
+    def len(self):
+        return len(self.text)
