@@ -57,6 +57,7 @@ c1 = test1.compile()
 print(test1.match('!!aaa   bbb@@@@').get_full())
 # print(test1.match('1 xxx').get_full())
 
+'''
 print('========')
 print(cplusplus_gen(
     'mylang',
@@ -65,3 +66,4 @@ print(cplusplus_gen(
     'MYLANG_SYNTAX_HPP'
 ))
 print('========')
+'''
