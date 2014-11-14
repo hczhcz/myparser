@@ -98,7 +98,7 @@ public:
 
         for (const Node *child: children) {
             result += '\n';
-            for (size_t i = 0; i < indent; ++i) {
+            for (size_t i = 0; i < indent + 1; ++i) {
                 result += "    ";
             }
             result += child->getTree(indent + 1);
@@ -179,18 +179,20 @@ public:
     virtual const std::string getTree(size_t indent = 0) const {
         static const std::string error = E::getStr();
 
-        return getRule()->getName() + " - " + error;
+        return getRule()->getName() + " - ERROR: " + error;
     }
 };
 
 template <class E>
-class NodeErrorWrap: public NodeErrorNative<E> {
+class NodeErrorWrap: public NodeError<> {
 private:
     const Node *child;
 
 public:
+    using ErrorType = E;
+
     inline NodeErrorWrap(const Input &input, const Node *value):
-        NodeErrorNative<E>(input), child(value) {}
+        NodeError<>(input), child(value) {}
 
     virtual ~NodeErrorWrap() {
         delete child;
@@ -198,6 +200,20 @@ public:
 
     virtual const std::string getFullText() const {
         return child->getFullText();
+    }
+
+    virtual const std::string getTree(size_t indent = 0) const {
+        static const std::string error = E::getStr();
+
+        std::string result = getRule()->getName() + " - ERROR: " + error;
+
+        result += '\n';
+        for (size_t i = 0; i < indent + 1; ++i) {
+            result += "    ";
+        }
+        result += child->getTree(indent + 1);
+
+        return result;
     }
 
     inline const Node *getChild() const {
