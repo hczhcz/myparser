@@ -18,7 +18,7 @@ public:
 
     virtual ~Node() {}
 
-    virtual operator bool() const = 0;
+    virtual bool accepted() const = 0;
 
     virtual const Rule *getRule() const = 0;
 
@@ -52,7 +52,7 @@ public:
         }
     }
 
-    virtual operator bool() const {
+    virtual bool accepted() const {
         return true;
     }
 
@@ -104,7 +104,7 @@ public:
 
     virtual ~NodeText() {}
 
-    virtual operator bool() const {
+    virtual bool accepted() const {
         return true;
     }
 
@@ -113,6 +113,8 @@ public:
     }
 
     virtual const std::string getTree(size_t indent = 0) const {
+        (void) indent;
+
         return getRule()->getName() + " - " + text;
     }
 
@@ -132,8 +134,8 @@ public:
 
     virtual ~NodeError() {}
 
-    virtual operator bool() const {
-        return true;
+    virtual bool accepted() const {
+        return false;
     }
 
     virtual const Rule *getRule() const {
@@ -158,6 +160,8 @@ public:
     }
 
     virtual const std::string getTree(size_t indent = 0) const {
+        (void) indent;
+
         static const std::string error = E::getStr();
 
         return getRule()->getName() + " - ERROR: " + error;

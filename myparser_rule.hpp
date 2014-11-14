@@ -83,7 +83,7 @@ private:
 
         const Node *current = Member::parse(input_new, end);
 
-        if (current) {
+        if (current->accepted()) {
             input = input_new;
 
             return current;
@@ -91,7 +91,7 @@ private:
             const Node *later = runRule<Rx...>(input, end);
 
             // select the best one
-            if (later || later->getPos() > current->getPos()) {
+            if (later->accepted() || later->getPos() > current->getPos()) {
                 delete current;
 
                 return later;
@@ -107,11 +107,16 @@ private:
     static inline const Node *runRule(
         Input &input, const Input &end
     ) {
+        (void) end;
+
         return new NodeErrorNativeTyped<SelfType, ErrorList>(input);
     }
 
 public:
     static const Node *parse(Input &input, const Input &end) {
+        // mpDebug(N::getStr());
+        // mpDebug(*input);
+
         return runRule<RL...>(input, end);
     }
 };
@@ -139,6 +144,9 @@ private:
     static inline const Node *runRegex(
         Input &input, const Input &end
     ) {
+        // mpDebug(N::getStr());
+        // mpDebug(*input);
+
         #if defined(MYPARSER_BOOST_XPRESSIVE)
             static const regex_lib::basic_regex<Input> re =
                 regex_lib::basic_regex<Input>::compile<Input>(
@@ -193,7 +201,7 @@ public:
 
         const Node *result = RD<BuiltinKeyword>::parse(input, end);
 
-        if (result && result->getFullText() == keyword) {
+        if (result->accepted() && result->getFullText() == keyword) {
             return result;
         } else {
             return new NodeErrorWrap<ErrorKeyword>(input, result);
@@ -213,6 +221,8 @@ template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
     static const Node *parse(Input &input, const Input &end) {
+        (void) end;
+
         static const std::string error = E::getStr();
 
         return new NodeErrorNative<E>(input);
@@ -233,7 +243,7 @@ public:
                 const Node *current = R::parse(input, end);
 
                 result->putChild(current);
-                if (!current) {
+                if (!current->accepted()) {
                     if (i < R::least) {
                         return false;
                     } else {
@@ -249,6 +259,10 @@ public:
         static inline bool runRule(
             NodeListTyped<LST> *&result, Input &input, const Input &end
         ) {
+            (void) result;
+            (void) input;
+            (void) end;
+
             return true;
         }
 

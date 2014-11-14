@@ -11,6 +11,18 @@
 #include <string>
 #include <vector>
 
+#if defined(MYPARSER_DEBUG)
+    #include <iostream>
+
+    template <class T>
+    inline void mpDebug(T value) {
+        std::cerr << value << std::endl;
+    }
+#else
+    template <class T>
+    inline void mpDebug(T value) {}
+#endif
+
 #if defined(MYPARSER_BOOST_REGEX)
     #include <boost/regex.hpp>
     namespace regex_lib = boost;

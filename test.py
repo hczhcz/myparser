@@ -54,8 +54,8 @@ id:
 
 print(test1.dump())
 c1 = test1.compile()
-print(test1.match('!!aaa   bbb@@@@').get_full())
-# print(test1.match('1 xxx').get_full())
+print(test1.match('!!aaa   bbb@@@@').get_tree())
+# print(test1.match('1 xxx').get_tree())
 
 '''
 print('========')
