@@ -1,12 +1,28 @@
 #ifndef MYPARSER_COMMON_HPP
 #define MYPARSER_COMMON_HPP
 
+// option list
+
+#define MYPARSER_BOOST_XPRESSIVE
+
 // library
 
 #include <limits>
 #include <string>
 #include <vector>
-#include <regex>
+
+#if defined(MYPARSER_BOOST_REGEX)
+    #include <boost/regex.hpp>
+    namespace regex_lib = boost;
+#elif defined(MYPARSER_BOOST_XPRESSIVE)
+    #include <boost/xpressive/xpressive_dynamic.hpp>
+    namespace regex_lib = boost::xpressive;
+#elif defined(MYPARSER_STD_REGEX)
+    #include <regex>
+    namespace regex_lib = std;
+#else
+    // Error!
+#endif
 
 namespace myparser {
 

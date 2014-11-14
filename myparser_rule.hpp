@@ -139,17 +139,25 @@ private:
     static inline const Node *runRegex(
         Input &input, const Input &end
     ) {
-        static const std::regex regex(
-            RX::getStr(),
-            std::regex_constants::extended
-        );
+        #if defined(MYPARSER_BOOST_XPRESSIVE)
+            static const regex_lib::basic_regex<Input> re =
+                regex_lib::basic_regex<Input>::compile<Input>(
+                    RX::getStr().cbegin(),
+                    RX::getStr().cend()
+                );
+        #else
+            static const regex_lib::regex re(
+                RX::getStr(),
+                regex_lib::regex_constants::extended
+            );
+        #endif
 
-        std::match_results<Input> mdata;
+        regex_lib::match_results<Input> mdata;
 
         if (
-            regex_search(
-                input, end, mdata, regex,
-                std::regex_constants::match_continuous
+            regex_lib::regex_search(
+                input, end, mdata, re,
+                regex_lib::regex_constants::match_continuous
             )
         ) {
             auto str = mdata.str();
