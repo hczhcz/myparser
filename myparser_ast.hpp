@@ -73,12 +73,16 @@ public:
     virtual const std::string getTree(size_t indent = 0) const {
         std::string result = getRule()->getName();
 
-        for (const Node *child: children) {
-            result += '\n';
-            for (size_t i = 0; i < indent + 1; ++i) {
-                result += "    ";
+        if (children.size() == 1) {
+            result += " - " + children[0]->getTree(indent);
+        } else {
+            for (const Node *child: children) {
+                result += '\n';
+                for (size_t i = 0; i < indent + 1; ++i) {
+                    result += "    ";
+                }
+                result += child->getTree(indent + 1);
             }
-            result += child->getTree(indent + 1);
         }
 
         return result;
