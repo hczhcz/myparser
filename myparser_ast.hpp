@@ -70,7 +70,7 @@ public:
         Node(input), children() {}
 
     virtual ~NodeList() {
-        for (Node *child: children) {
+        for (const Node *child: children) {
             delete child;
         }
     }
@@ -86,7 +86,7 @@ public:
     virtual const std::string getFullText() const {
         std::string result = "";
 
-        for (Node *child: children) {
+        for (const Node *child: children) {
             result += child->getFullText();
         }
 
@@ -96,7 +96,7 @@ public:
     virtual const std::string getTree(size_t indent = 0) const {
         std::string result = getRule()->getName();
 
-        for (Node *child: children) {
+        for (const Node *child: children) {
             result += '\n';
             for (size_t i = 0; i < indent; ++i) {
                 result += "    ";
@@ -218,26 +218,28 @@ inline const NodeError<> *Node::castError() const {
 }
 
 template <class NT, class T>
-class RuleTyped: public T {
+class NodeTyped: public T {
 public:
+    using T::T;
+
     using RuleType = NT;
 
     virtual RulePtr getRule() const {
-        return NT::instance;
+        return NT::getInstance();
     }
 };
 
 template <class NT>
-using NodeListTyped = RuleTyped<NT, NodeList<>>;
+using NodeListTyped = NodeTyped<NT, NodeList<>>;
 
 template <class NT>
-using NodeTextTyped = RuleTyped<NT, NodeText<>>;
+using NodeTextTyped = NodeTyped<NT, NodeText<>>;
 
 template <class NT, class E>
-using NodeErrorNativeTyped = RuleTyped<NT, NodeErrorNative<E>>;
+using NodeErrorNativeTyped = NodeTyped<NT, NodeErrorNative<E>>;
 
 template <class NT, class E>
-using NodeErrorWrapTyped = RuleTyped<NT, NodeErrorWrap<E>>;
+using NodeErrorWrapTyped = NodeTyped<NT, NodeErrorWrap<E>>;
 
 }
 

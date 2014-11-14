@@ -42,6 +42,11 @@ public:
 
 template <class N>
 class RuleNamed: public Rule {
+protected:
+    inline RuleNamed(): Rule() {}
+
+    // virtual ~RuleNamed() {}
+
 public:
     virtual const std::string &getName() const {
         static const std::string name = N::getStr();
@@ -54,10 +59,19 @@ public:
 
 template <class N, class... RL>
 class RuleList: public RuleNamed<N> {
+protected:
+    inline RuleList(): RuleNamed<N>() {}
+
+    // virtual ~RuleList() {}
+
 public:
     using SelfType = RuleList<N, RL...>;
 
-    static const SelfType instance;
+    static inline const SelfType *getInstance() {
+        static const SelfType instance;
+
+        return &instance;
+    }
 
 private:
     template <class R, class... Rx>
@@ -70,14 +84,14 @@ private:
             typename R
             ::template Helper<SelfType>;
 
-        Node *current = Member::parse(input_new, end);
+        const Node *current = Member::parse(input_new, end);
 
         if (current) {
             input = input_new;
 
             return current;
         } else {
-            Node *later = runRule<Rx...>(input, end);
+            const Node *later = runRule<Rx...>(input, end);
 
             // select the best one
             if (later || later->getPos() > current->getPos()) {
@@ -110,10 +124,19 @@ using RuleBuiltin = RuleList<N, RL...>;
 
 template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
+protected:
+    inline RuleRegex(): RuleNamed<N>() {}
+
+    // virtual ~RuleRegex() {}
+
 public:
     using SelfType = RuleRegex<N, RX>;
 
-    static const SelfType instance;
+    static inline const SelfType *getInstance() {
+        static const SelfType instance;
+
+        return &instance;
+    }
 
 private:
     static inline const Node *runRegex(
@@ -202,7 +225,7 @@ public:
             NodeListTyped<LST> *&result, Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
-                Node *current = R::parse(input, end);
+                const Node *current = R::parse(input, end);
 
                 result->putChild(current);
                 if (!current) {
