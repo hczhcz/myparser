@@ -3,17 +3,24 @@
 
 // option list
 
-#define MYPARSER_BOOST_XPRESSIVE
+#ifndef MYPARSER_CUSTOMIZED
+    #define MYPARSER_DEBUG
+
+    #ifdef __GLIBCXX__
+        #define MYPARSER_BOOST_XPRESSIVE
+    #else
+        #define MYPARSER_STD_REGEX
+    #endif
+#endif
 
 // library
 
 #include <limits>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #if defined(MYPARSER_DEBUG)
-    #include <iostream>
-
     template <class T>
     inline void mpDebug(T value) {
         std::cerr << value << std::endl;
@@ -34,6 +41,10 @@
     namespace regex_lib = std;
 #else
     // Error!
+#endif
+
+#if defined(MYPARSER_CCC)
+    #include "lib/ccc.hpp"
 #endif
 
 namespace myparser {

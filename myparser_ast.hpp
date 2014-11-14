@@ -123,7 +123,7 @@ public:
     }
 
     template <class T>
-    inline const T &getValue() const = delete;
+    inline const T &getValue() const = delete; // reserved
 };
 
 template <class TX> // actually not a template

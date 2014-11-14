@@ -155,8 +155,7 @@ private:
                 );
         #else
             static const regex_lib::regex re(
-                RX::getStr(),
-                regex_lib::regex_constants::extended
+                RX::getStr()
             );
         #endif
 
