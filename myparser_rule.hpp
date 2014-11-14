@@ -10,6 +10,7 @@ namespace myparser {
 using BuiltinRoot = MP_STR("root", 4);
 using BuiltinSpace = MP_STR("space", 5);
 using BuiltinKeyword = MP_STR("keyword", 7);
+using BuiltinError = MP_STR("error", 5);
 
 using ErrorList = MP_STR("Nothing matched", 15);
 using ErrorRegex = MP_STR("Regex not matched", 17);
@@ -45,6 +46,14 @@ protected:
     // virtual ~RuleNamed() {}
 
 public:
+    using SelfType = RuleNamed<N>;
+
+    static inline const SelfType *getInstance() {
+        static const SelfType instance;
+
+        return &instance;
+    }
+
     virtual const std::string &getName() const {
         static const std::string name = N::getStr();
 
@@ -71,7 +80,7 @@ public:
     }
 
 private:
-    template <class R, class... Rx>
+    template <size_t I, class R, class... Rx>
     static inline const Node *runRule(
         Input &input, const Input &end
     ) {
@@ -79,7 +88,7 @@ private:
 
         using Member =
             typename R
-            ::template Helper<SelfType>;
+            ::template Helper<SelfType, I>;
 
         const Node *current = Member::parse(input_new, end);
 
@@ -88,7 +97,7 @@ private:
 
             return current;
         } else {
-            const Node *later = runRule<Rx...>(input, end);
+            const Node *later = runRule<I + 1, Rx...>(input, end);
 
             // select the best one
             if (later->accepted() || later->getPos() > current->getPos()) {
@@ -103,7 +112,7 @@ private:
         }
     }
 
-    template <std::nullptr_t P = nullptr> // iteration finished
+    template <size_t I, std::nullptr_t P = nullptr> // iteration finished
     static inline const Node *runRule(
         Input &input, const Input &end
     ) {
@@ -117,7 +126,7 @@ public:
         // mpDebug(N::getStr());
         // mpDebug(*input);
 
-        return runRule<RL...>(input, end);
+        return runRule<0, RL...>(input, end);
     }
 };
 
@@ -203,7 +212,7 @@ public:
         if (result->accepted() && result->getFullText() == keyword) {
             return result;
         } else {
-            return new NodeErrorWrap<ErrorKeyword>(input, result);
+            return new NodeErrorWrapTyped<RuleNamed<BuiltinError>, ErrorKeyword>(input, result);
         }
     }
 };
@@ -224,19 +233,19 @@ public:
 
         static const std::string error = E::getStr();
 
-        return new NodeErrorNative<E>(input);
+        return new NodeErrorNativeTyped<RuleNamed<BuiltinError>, E>(input);
     }
 };
 
 template <class... RL>
 class RuleLine {
 public:
-    template <class LST>
+    template <class LST, size_t I>
     class Helper {
     private:
         template <class R, class... Rx>
         static inline bool runRule(
-            NodeListTyped<LST> *&result, Input &input, const Input &end
+            NodeListTyped<LST, I> *&result, Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
                 const Node *current = R::parse(input, end);
@@ -256,7 +265,7 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static inline bool runRule(
-            NodeListTyped<LST> *&result, Input &input, const Input &end
+            NodeListTyped<LST, I> *&result, Input &input, const Input &end
         ) {
             (void) result;
             (void) input;
@@ -267,7 +276,7 @@ public:
 
     public:
         static const Node *parse(Input &input, const Input &end) {
-            NodeListTyped<LST> *result = new NodeListTyped<LST>(input);
+            NodeListTyped<LST, I> *result = new NodeListTyped<LST, I>(input);
 
             if (runRule<RL...>(result, input, end)) {
                 return result;

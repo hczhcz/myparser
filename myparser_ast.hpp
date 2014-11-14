@@ -93,6 +93,16 @@ public:
     }
 };
 
+template <size_t I>
+class NodeListIndexed: public NodeList<> {
+public:
+    using NodeList<>::NodeList;
+
+    static inline size_t getIndex() {
+        return I;
+    }
+};
+
 template <class TX> // actually not a template
 class NodeText: public Node {
 private:
@@ -136,10 +146,6 @@ public:
 
     virtual bool accepted() const {
         return false;
-    }
-
-    virtual const Rule *getRule() const {
-        return nullptr; // TODO: really?
     }
 
     // TODO: virtual function: getErrorMessage()
@@ -230,8 +236,8 @@ public:
     }
 };
 
-template <class NT>
-using NodeListTyped = NodeTyped<NT, NodeList<>>;
+template <class NT, size_t I>
+using NodeListTyped = NodeTyped<NT, NodeListIndexed<I>>;
 
 template <class NT>
 using NodeTextTyped = NodeTyped<NT, NodeText<>>;
