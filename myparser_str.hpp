@@ -1,7 +1,7 @@
 #ifndef MYPARSER_STR_HPP
 #define MYPARSER_STR_HPP
 
-#include <string>
+#include "myparser_common.hpp"
 
 #define MP_STR_0(str) /* none */
 #define MP_STR_1(str) str[0]

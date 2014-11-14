@@ -1,34 +1,11 @@
 #ifndef MYPARSER_AST_HPP
 #define MYPARSER_AST_HPP
 
-#include <vector>
-#include <string>
+#include "myparser_common.hpp"
 
 namespace myparser {
 
-// forward declaration
-
-class Rule;
-
-template <class TX = void>
-class NodeList;
-
-template <class TX = void>
-class NodeText;
-
-template <class TX = void>
-class NodeError;
-
-template <class E>
-class NodeErrorNative;
-
-template <class E>
-class NodeErrorWrap;
-
-// forward declaration finished
-
-using RulePtr = const Rule *;
-using Input = std::string::iterator;
+using Input = std::string::const_iterator;
 
 class Node {
 private:
@@ -43,7 +20,7 @@ public:
 
     virtual operator bool() const = 0;
 
-    virtual RulePtr getRule() const = 0;
+    virtual const Rule *getRule() const = 0;
 
     virtual const std::string getFullText() const = 0;
 
@@ -155,7 +132,7 @@ public:
         return true;
     }
 
-    virtual RulePtr getRule() const {
+    virtual const Rule *getRule() const {
         return nullptr; // TODO: really?
     }
 
@@ -240,7 +217,7 @@ public:
 
     using RuleType = NT;
 
-    virtual RulePtr getRule() const {
+    virtual const Rule *getRule() const {
         return NT::getInstance();
     }
 };
