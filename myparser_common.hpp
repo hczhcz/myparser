@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 #if defined(MYPARSER_DEBUG)
     template <class T>

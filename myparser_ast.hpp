@@ -22,9 +22,25 @@ public:
 
     virtual const Rule *getRule() const = 0;
 
-    virtual const std::string getFullText() const = 0;
+    virtual void getFullText(std::ostream &out) const = 0;
 
-    virtual const std::string getTree(size_t indent = 0) const = 0;
+    inline const std::string getFullText() const {
+        std::ostringstream result;
+
+        getFullText(result);
+
+        return result.str();
+    }
+
+    virtual void getTree(std::ostream &out, size_t indent = 0) const = 0;
+
+    inline const std::string getTree(size_t indent = 0) const {
+        std::ostringstream result;
+
+        getTree(result, indent);
+
+        return result.str();
+    }
 
     inline const Input &getPos() const {
         return pos;
@@ -60,32 +76,30 @@ public:
         children.push_back(value);
     }
 
-    virtual const std::string getFullText() const {
-        std::string result = "";
-
+    virtual void getFullText(std::ostream &out) const {
         for (const Node *child: children) {
-            result += child->getFullText();
+            out << child->getFullText();
         }
-
-        return result;
     }
 
-    virtual const std::string getTree(size_t indent = 0) const {
-        std::string result = getRule()->getName();
+    virtual size_t getIndex() const = 0;
+
+    virtual void getTree(std::ostream &out, size_t indent = 0) const {
+        out << getRule()->getName() << '[' << getIndex() << ']';
 
         if (children.size() == 1) {
-            result += " - " + children[0]->getTree(indent);
+            out << " - ";
+            children[0]->getTree(out, indent);
         } else {
             for (const Node *child: children) {
-                result += '\n';
+                out << '\n';
+
                 for (size_t i = 0; i < indent + 1; ++i) {
-                    result += "    ";
+                    out << "    ";
                 }
-                result += child->getTree(indent + 1);
+                child->getTree(out, indent + 1);
             }
         }
-
-        return result;
     }
 
     inline const std::vector<const Node *> &getChildren() const {
@@ -98,7 +112,7 @@ class NodeListIndexed: public NodeList<> {
 public:
     using NodeList<>::NodeList;
 
-    static inline size_t getIndex() {
+    virtual size_t getIndex() const {
         return I;
     }
 };
@@ -118,14 +132,14 @@ public:
         return true;
     }
 
-    virtual const std::string getFullText() const {
-        return text;
+    virtual void getFullText(std::ostream &out) const {
+        out << text;
     }
 
-    virtual const std::string getTree(size_t indent = 0) const {
+    virtual void getTree(std::ostream &out, size_t indent = 0) const {
         (void) indent;
 
-        return getRule()->getName() + " - " + text;
+        out << getRule()->getName() << " - " << text;
     }
 
     inline const std::string &getText() const {
@@ -161,16 +175,17 @@ public:
 
     virtual ~NodeErrorNative() {}
 
-    virtual const std::string getFullText() const {
-        return "";
+    virtual void getFullText(std::ostream &out) const {
+        // nothing
+        (void) out;
     }
 
-    virtual const std::string getTree(size_t indent = 0) const {
+    virtual void getTree(std::ostream &out, size_t indent = 0) const {
         (void) indent;
 
         static const std::string error = E::getStr();
 
-        return getRule()->getName() + " - ERROR: " + error;
+        out << getRule()->getName() << " - ERROR: " << error;
     }
 };
 
@@ -189,22 +204,19 @@ public:
         delete child;
     }
 
-    virtual const std::string getFullText() const {
-        return child->getFullText();
+    virtual void getFullText(std::ostream &out) const {
+        out << child->getFullText();
     }
 
-    virtual const std::string getTree(size_t indent = 0) const {
+    virtual void getTree(std::ostream &out, size_t indent = 0) const {
         static const std::string error = E::getStr();
 
-        std::string result = getRule()->getName() + " - ERROR: " + error;
+        out << getRule()->getName() << " - ERROR: " << error << '\n';
 
-        result += '\n';
         for (size_t i = 0; i < indent + 1; ++i) {
-            result += "    ";
+            out << "    ";
         }
-        result += child->getTree(indent + 1);
-
-        return result;
+        out << child->getTree(indent + 1);
     }
 
     inline const Node *getChild() const {
