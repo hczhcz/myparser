@@ -84,11 +84,11 @@ private:
     static inline const Node *runRule(
         Input &input, const Input &end
     ) {
-        Input input_new = input;
-
         using Member =
             typename R
             ::template Helper<SelfType, I>;
+
+        Input input_new = input;
 
         const Node *current = Member::parse(input_new, end);
 

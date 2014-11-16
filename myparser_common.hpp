@@ -23,16 +23,6 @@
 #include <iostream>
 #include <sstream>
 
-#if defined(MYPARSER_DEBUG)
-    template <class T>
-    inline void mpDebug(T value) {
-        std::cerr << value << std::endl;
-    }
-#else
-    template <class T>
-    inline void mpDebug(T value) {}
-#endif
-
 #if defined(MYPARSER_BOOST_REGEX)
     #include <boost/regex.hpp>
     namespace regex_lib = boost;
@@ -51,6 +41,16 @@
 #endif
 
 namespace myparser {
+
+#if defined(MYPARSER_DEBUG)
+    template <class T>
+    inline void mpDebug(T value) {
+        std::cerr << value << std::endl;
+    }
+#else
+    template <class T>
+    inline void mpDebug(T value) {}
+#endif
 
 #if defined(MYPARSER_AST_CCC)
     const auto style_index = ccc::cf_magenta + ccc::s_bold;
