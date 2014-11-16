@@ -20,9 +20,9 @@ public:
 
     virtual bool accepted() const = 0;
 
-    virtual const Rule *getRule() const = 0;
-
     virtual bool empty() const = 0;
+
+    virtual const Rule *getRule() const = 0;
 
     virtual size_t getLen() const = 0;
 
@@ -73,11 +73,13 @@ public:
     }
 
     virtual bool accepted() const {
-        return true;
-    }
+        for (const Node *child: children) {
+            if (!child->accepted()) {
+                return false;
+            }
+        }
 
-    inline void putChild(const Node *value) {
-        children.push_back(value);
+        return true;
     }
 
     virtual bool empty() const {
@@ -88,6 +90,10 @@ public:
         }
 
         return true;
+    }
+
+    inline void putChild(const Node *value) {
+        children.push_back(value);
     }
 
     virtual size_t getLen() const {

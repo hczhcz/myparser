@@ -7,6 +7,7 @@
     #define MYPARSER_DEBUG
     #define MYPARSER_AST_SIMPLE
     #define MYPARSER_AST_CCC
+    // #define MYPARSER_ERROR_LINE
 
     // use boost instead of libstdc++
     #ifdef __GLIBCXX__

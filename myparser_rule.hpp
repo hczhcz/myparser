@@ -281,7 +281,11 @@ public:
             if (runRule<RL...>(result, input, end)) {
                 return result;
             } else {
-                return new NodeErrorWrapTyped<LST, ErrorLine>(input, result);
+                #ifdef MYPARSER_ERROR_LINE
+                    return new NodeErrorWrapTyped<LST, ErrorLine>(input, result);
+                #else
+                    return result;
+                #endif
             }
         }
     };
