@@ -3,7 +3,7 @@
 
 // option list
 
-#ifndef MYPARSER_CUSTOMIZED
+#if !defined(MYPARSER_CUSTOMIZED)
     // global
 
     #define MYPARSER_DEBUG
@@ -14,7 +14,7 @@
     // #define MYPARSER_ERROR_LINE
 
     // use boost instead of libstdc++
-    #ifdef __GLIBCXX__
+    #if defined(__GLIBCXX__)
         #define MYPARSER_BOOST_XPRESSIVE
     #else
         #define MYPARSER_STD_REGEX
