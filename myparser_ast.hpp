@@ -114,7 +114,7 @@ public:
 
     virtual void getFullText(std::ostream &out) const {
         for (const Node *child: children) {
-            out << child->getFullText();
+            child->getFullText(out);
         }
     }
 
@@ -142,14 +142,21 @@ public:
             out << getRule()->getName() << '[';
             out << style_index << getIndex() << style_normal;
             out << ']';
-        } else {
-            out << '*';
         }
 
         if (children2.size() == 1) {
-            out << style_faint << " - " << style_normal;
+            if (simplify < 2) {
+                out << style_faint << " - " << style_normal;
+            }
+
             children2[0]->getTree(out, indent, simplify);
         } else {
+            if (simplify < 2) {
+                // nothing
+            } else {
+                out << "=>";
+            }
+
             for (const Node *child: children2) {
                 out << '\n';
 
@@ -210,11 +217,9 @@ public:
 
         if (simplify < 2) {
             out << getRule()->getName();
-        } else {
-            out << '*';
+            out << style_faint << " - " << style_normal;
         }
 
-        out << style_faint << " - " << style_normal;
         out << style_keyword << text << style_normal;
     }
 
@@ -273,11 +278,9 @@ public:
 
         if (simplify < 2) {
             out << getRule()->getName();
-        } else {
-            out << '*';
+            out << style_faint << " - " << style_normal;
         }
 
-        out << style_faint << " - " << style_normal;
         out << style_error << "ERROR: " << style_normal;
         out << error;
     }
@@ -303,7 +306,7 @@ public:
     }
 
     virtual void getFullText(std::ostream &out) const {
-        out << child->getFullText();
+        child->getFullText(out);
     }
 
     virtual void getTree(
@@ -313,11 +316,9 @@ public:
 
         if (simplify < 2) {
             out << getRule()->getName();
-        } else {
-            out << '*';
+            out << style_faint << " - " << style_normal;
         }
 
-        out << style_faint << " - " << style_normal;
         out << style_error << "ERROR: " << style_normal;
         out << error << '\n';
 
