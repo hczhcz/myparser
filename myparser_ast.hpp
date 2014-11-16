@@ -22,6 +22,10 @@ public:
 
     virtual const Rule *getRule() const = 0;
 
+    virtual bool empty() const = 0;
+
+    virtual size_t getLen() const = 0;
+
     virtual void getFullText(std::ostream &out) const = 0;
 
     inline const std::string getFullText() const {
@@ -76,6 +80,26 @@ public:
         children.push_back(value);
     }
 
+    virtual bool empty() const {
+        for (const Node *child: children) {
+            if (!child->empty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    virtual size_t getLen() const {
+        size_t result = 0;
+
+        for (const Node *child: children) {
+            result += child->getLen();
+        }
+
+        return result;
+    }
+
     virtual void getFullText(std::ostream &out) const {
         for (const Node *child: children) {
             out << child->getFullText();
@@ -85,13 +109,26 @@ public:
     virtual size_t getIndex() const = 0;
 
     virtual void getTree(std::ostream &out, size_t indent = 0) const {
-        out << getRule()->getName() << '[' << getIndex() << ']';
-
-        if (children.size() == 1) {
-            out << " - ";
-            children[0]->getTree(out, indent);
-        } else {
+        #if defined(MYPARSER_AST_SIMPLE)
+            std::vector<const Node *> children1;
             for (const Node *child: children) {
+                if (!child->empty()) {
+                    children1.push_back(child);
+                }
+            }
+        #else
+            auto &children1 = children;
+        #endif
+
+        out << getRule()->getName() << '[';
+        out << style_index << getIndex() << style_normal;
+        out << ']';
+
+        if (children1.size() == 1) {
+            out << style_faint << " - " << style_normal;
+            children1[0]->getTree(out, indent);
+        } else {
+            for (const Node *child: children1) {
                 out << '\n';
 
                 for (size_t i = 0; i < indent + 1; ++i) {
@@ -132,6 +169,14 @@ public:
         return true;
     }
 
+    virtual bool empty() const {
+        return text.size() == 0;
+    }
+
+    virtual size_t getLen() const {
+        return text.size();
+    }
+
     virtual void getFullText(std::ostream &out) const {
         out << text;
     }
@@ -164,6 +209,10 @@ public:
         return false;
     }
 
+    virtual bool empty() const {
+        return false;
+    }
+
     // TODO: virtual function: getErrorMessage()
 };
 
@@ -176,6 +225,10 @@ public:
         NodeError(input) {}
 
     virtual ~NodeErrorNative() {}
+
+    virtual size_t getLen() const {
+        return 0;
+    }
 
     virtual void getFullText(std::ostream &out) const {
         // nothing
@@ -207,6 +260,10 @@ public:
 
     virtual ~NodeErrorWrap() {
         delete child;
+    }
+
+    virtual size_t getLen() const {
+        return child->getLen();
     }
 
     virtual void getFullText(std::ostream &out) const {

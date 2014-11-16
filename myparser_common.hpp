@@ -5,6 +5,7 @@
 
 #ifndef MYPARSER_CUSTOMIZED
     #define MYPARSER_DEBUG
+    #define MYPARSER_AST_SIMPLE
     #define MYPARSER_AST_CCC
 
     // use boost instead of libstdc++
