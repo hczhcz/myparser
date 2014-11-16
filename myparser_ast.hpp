@@ -139,7 +139,9 @@ public:
     virtual void getTree(std::ostream &out, size_t indent = 0) const {
         (void) indent;
 
-        out << getRule()->getName() << " - " << text;
+        out << getRule()->getName();
+        out << style_faint << " - " << style_normal;
+        out << style_keyword << text << style_normal;
     }
 
     inline const std::string &getText() const {
@@ -185,7 +187,10 @@ public:
 
         static const std::string error = E::getStr();
 
-        out << getRule()->getName() << " - ERROR: " << error;
+        out << getRule()->getName();
+        out << style_faint << " - " << style_normal;
+        out << style_error << "ERROR: " << style_normal;
+        out << error;
     }
 };
 
@@ -211,7 +216,10 @@ public:
     virtual void getTree(std::ostream &out, size_t indent = 0) const {
         static const std::string error = E::getStr();
 
-        out << getRule()->getName() << " - ERROR: " << error << '\n';
+        out << getRule()->getName();
+        out << style_faint << " - " << style_normal;
+        out << style_error << "ERROR: " << style_normal;
+        out << error << '\n';
 
         for (size_t i = 0; i < indent + 1; ++i) {
             out << "    ";
