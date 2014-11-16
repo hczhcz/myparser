@@ -4,8 +4,12 @@
 // option list
 
 #ifndef MYPARSER_CUSTOMIZED
+    // global
+
     #define MYPARSER_DEBUG
-    #define MYPARSER_AST_SIMPLE
+
+    // parser
+
     #define MYPARSER_AST_CCC
     // #define MYPARSER_ERROR_LINE
 

@@ -36,12 +36,14 @@ public:
         return result.str();
     }
 
-    virtual void getTree(std::ostream &out, size_t indent = 0) const = 0;
+    virtual void getTree(
+        std::ostream &out, size_t indent = 0, size_t simplify = 1
+    ) const = 0;
 
-    inline const std::string getTree(size_t indent = 0) const {
+    inline const std::string getTree(size_t indent = 0, size_t simplify = 1) const {
         std::ostringstream result;
 
-        getTree(result, indent);
+        getTree(result, indent, simplify);
 
         return result.str();
     }
@@ -73,13 +75,17 @@ public:
     }
 
     virtual bool accepted() const {
-        for (const Node *child: children) {
-            if (!child->accepted()) {
-                return false;
+        #if defined(MYPARSER_ERROR_LINE)
+            return true;
+        #else
+            for (const Node *child: children) {
+                if (!child->accepted()) {
+                    return false;
+                }
             }
-        }
 
-        return true;
+            return true;
+        #endif
     }
 
     virtual bool empty() const {
@@ -114,33 +120,43 @@ public:
 
     virtual size_t getIndex() const = 0;
 
-    virtual void getTree(std::ostream &out, size_t indent = 0) const {
-        #if defined(MYPARSER_AST_SIMPLE)
-            std::vector<const Node *> children1;
+    virtual void getTree(
+        std::ostream &out, size_t indent = 0, size_t simplify = 1
+    ) const {
+        std::vector<const Node *> children1;
+
+        if (simplify < 1) {
+            // nothing
+        } else {
             for (const Node *child: children) {
                 if (!child->empty()) {
                     children1.push_back(child);
                 }
             }
-        #else
-            auto &children1 = children;
-        #endif
+        }
 
-        out << getRule()->getName() << '[';
-        out << style_index << getIndex() << style_normal;
-        out << ']';
+        const std::vector<const Node *> children2 =
+            (simplify < 1) ? children : children1;
 
-        if (children1.size() == 1) {
-            out << style_faint << " - " << style_normal;
-            children1[0]->getTree(out, indent);
+        if (simplify < 2) {
+            out << getRule()->getName() << '[';
+            out << style_index << getIndex() << style_normal;
+            out << ']';
         } else {
-            for (const Node *child: children1) {
+            out << '*';
+        }
+
+        if (children2.size() == 1) {
+            out << style_faint << " - " << style_normal;
+            children2[0]->getTree(out, indent, simplify);
+        } else {
+            for (const Node *child: children2) {
                 out << '\n';
 
                 for (size_t i = 0; i < indent + 1; ++i) {
                     out << "    ";
                 }
-                child->getTree(out, indent + 1);
+                child->getTree(out, indent + 1, simplify);
             }
         }
     }
@@ -187,10 +203,17 @@ public:
         out << text;
     }
 
-    virtual void getTree(std::ostream &out, size_t indent = 0) const {
+    virtual void getTree(
+        std::ostream &out, size_t indent = 0, size_t simplify = 1
+    ) const {
         (void) indent;
 
-        out << getRule()->getName();
+        if (simplify < 2) {
+            out << getRule()->getName();
+        } else {
+            out << '*';
+        }
+
         out << style_faint << " - " << style_normal;
         out << style_keyword << text << style_normal;
     }
@@ -241,12 +264,19 @@ public:
         (void) out;
     }
 
-    virtual void getTree(std::ostream &out, size_t indent = 0) const {
+    virtual void getTree(
+        std::ostream &out, size_t indent = 0, size_t simplify = 1
+    ) const {
         (void) indent;
 
         static const std::string error = E::getStr();
 
-        out << getRule()->getName();
+        if (simplify < 2) {
+            out << getRule()->getName();
+        } else {
+            out << '*';
+        }
+
         out << style_faint << " - " << style_normal;
         out << style_error << "ERROR: " << style_normal;
         out << error;
@@ -276,10 +306,17 @@ public:
         out << child->getFullText();
     }
 
-    virtual void getTree(std::ostream &out, size_t indent = 0) const {
+    virtual void getTree(
+        std::ostream &out, size_t indent = 0, size_t simplify = 1
+    ) const {
         static const std::string error = E::getStr();
 
-        out << getRule()->getName();
+        if (simplify < 2) {
+            out << getRule()->getName();
+        } else {
+            out << '*';
+        }
+
         out << style_faint << " - " << style_normal;
         out << style_error << "ERROR: " << style_normal;
         out << error << '\n';
@@ -287,7 +324,7 @@ public:
         for (size_t i = 0; i < indent + 1; ++i) {
             out << "    ";
         }
-        out << child->getTree(indent + 1);
+        child->getTree(out, indent + 1, simplify);
     }
 
     inline const Node *getChild() const {
