@@ -67,7 +67,7 @@ template <template <class N> class RD, class N, class... RL>
 class RuleList: public RuleNamed<N> {
 private:
     template <size_t I, class R, class... Rx>
-    static inline const Node *runRule(
+    static MYPARSER_INLINE const Node *runRule(
         Input &input, const Input &end
     ) {
         using Member =
@@ -99,7 +99,7 @@ private:
     }
 
     template <size_t I, std::nullptr_t P = nullptr> // iteration finished
-    static inline const Node *runRule(
+    static MYPARSER_INLINE const Node *runRule(
         Input &input, const Input &end
     ) {
         (void) end;
@@ -135,7 +135,7 @@ using RuleBuiltin = RuleList<RD, N, RL...>;
 template <template <class N> class RD, class N, class RX>
 class RuleRegex: public RuleNamed<N> {
 private:
-    static inline const Node *runRegex(
+    static MYPARSER_INLINE const Node *runRegex(
         Input &input, const Input &end
     ) {
         // mpDebug(N::getStr());
@@ -242,7 +242,7 @@ public:
     class Helper {
     private:
         template <class R, class... Rx>
-        static inline bool runRule(
+        static MYPARSER_INLINE bool runRule(
             NodeListTyped<LST, I> *&result, Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
@@ -262,7 +262,7 @@ public:
         }
 
         template <std::nullptr_t P = nullptr> // iteration finished
-        static inline bool runRule(
+        static MYPARSER_INLINE bool runRule(
             NodeListTyped<LST, I> *&result, Input &input, const Input &end
         ) {
             (void) result;

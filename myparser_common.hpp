@@ -12,6 +12,7 @@
 
     #define MYPARSER_AST_CCC
     // #define MYPARSER_ERROR_LINE
+    #define MYPARSER_FORCE_INLINE
 
     // use boost instead of libstdc++
     #if defined(__GLIBCXX__)
@@ -44,6 +45,12 @@
 
 #if defined(MYPARSER_AST_CCC)
     #include "lib/ccc.hpp"
+#endif
+
+#if defined(MYPARSER_FORCE_INLINE)
+    #define MYPARSER_INLINE __attribute__((always_inline)) inline
+#else
+    #define MYPARSER_INLINE inline
 #endif
 
 namespace myparser {
