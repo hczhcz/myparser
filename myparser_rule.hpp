@@ -63,22 +63,8 @@ public:
 
 //////// Named ////////
 
-template <class N, class... RL>
+template <template <class N> class RD, class N, class... RL>
 class RuleList: public RuleNamed<N> {
-protected:
-    inline RuleList(): RuleNamed<N>() {}
-
-    // virtual ~RuleList() {}
-
-public:
-    using SelfType = RuleList<N, RL...>;
-
-    static inline const SelfType *getInstance() {
-        static const SelfType instance;
-
-        return &instance;
-    }
-
 private:
     template <size_t I, class R, class... Rx>
     static inline const Node *runRule(
@@ -86,7 +72,7 @@ private:
     ) {
         using Member =
             typename R
-            ::template Helper<SelfType, I>;
+            ::template Helper<RD<N>, I>;
 
         Input input_new = input;
 
@@ -118,10 +104,23 @@ private:
     ) {
         (void) end;
 
-        return new NodeErrorNativeTyped<SelfType, ErrorList>(input);
+        return new NodeErrorNativeTyped<RD<N>, ErrorList>(input);
     }
 
+protected:
+    inline RuleList(): RuleNamed<N>() {}
+
+    // virtual ~RuleList() {}
+
 public:
+    using SelfType = RuleList<RD, N, RL...>;
+
+    static inline const SelfType *getInstance() {
+        static const SelfType instance;
+
+        return &instance;
+    }
+
     static const Node *parse(Input &input, const Input &end) {
         // mpDebug(N::getStr());
         // mpDebug(*input);
@@ -130,25 +129,11 @@ public:
     }
 };
 
-template <class N, class... RL>
-using RuleBuiltin = RuleList<N, RL...>;
+template <template <class N> class RD, class N, class... RL>
+using RuleBuiltin = RuleList<RD, N, RL...>;
 
-template <class N, class RX>
+template <template <class N> class RD, class N, class RX>
 class RuleRegex: public RuleNamed<N> {
-protected:
-    inline RuleRegex(): RuleNamed<N>() {}
-
-    // virtual ~RuleRegex() {}
-
-public:
-    using SelfType = RuleRegex<N, RX>;
-
-    static inline const SelfType *getInstance() {
-        static const SelfType instance;
-
-        return &instance;
-    }
-
 private:
     static inline const Node *runRegex(
         Input &input, const Input &end
@@ -179,13 +164,26 @@ private:
             auto str = mdata.str();
             input += str.size();
 
-            return new NodeTextTyped<SelfType>(input, str);
+            return new NodeTextTyped<RD<N>>(input, str);
         } else {
-            return new NodeErrorNativeTyped<SelfType, ErrorRegex>(input);
+            return new NodeErrorNativeTyped<RD<N>, ErrorRegex>(input);
         }
     }
 
+protected:
+    inline RuleRegex(): RuleNamed<N>() {}
+
+    // virtual ~RuleRegex() {}
+
 public:
+    using SelfType = RuleRegex<RD, N, RX>;
+
+    static inline const SelfType *getInstance() {
+        static const SelfType instance;
+
+        return &instance;
+    }
+
     static const Node *parse(Input &input, const Input &end) {
         return runRegex(input, end);
     }
@@ -225,7 +223,7 @@ public:
     }
 };
 
-template <class E, class TAG = TagNormal>
+template <template <class N> class RD, class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
     static const Node *parse(Input &input, const Input &end) {
