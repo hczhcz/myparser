@@ -61,9 +61,21 @@ public:
     }
 };
 
+// need specialization
+template <class N>
+class RuleDef: public RuleNamed<N> {
+public:
+    static const Node *parse(Input &input, const Input &end) {
+        (void) input;
+        (void) end;
+
+        return N::need_specialization();
+    }
+};
+
 //////// Named ////////
 
-template <template <class N> class RD, class N, class... RL>
+template <class N, class... RL>
 class RuleList: public RuleNamed<N> {
 private:
     template <size_t I, class R, class... Rx>
@@ -72,7 +84,7 @@ private:
     ) {
         using Member =
             typename R
-            ::template Helper<RD<N>, I>;
+            ::template Helper<RuleDef<N>, I>;
 
         Input input_new = input;
 
@@ -104,7 +116,7 @@ private:
     ) {
         (void) end;
 
-        return new NodeErrorNativeTyped<RD<N>, ErrorList>(input);
+        return new NodeErrorNativeTyped<RuleDef<N>, ErrorList>(input);
     }
 
 protected:
@@ -113,7 +125,7 @@ protected:
     // virtual ~RuleList() {}
 
 public:
-    using SelfType = RuleList<RD, N, RL...>;
+    using SelfType = RuleList<N, RL...>;
 
     static inline const SelfType *getInstance() {
         static const SelfType instance;
@@ -129,10 +141,10 @@ public:
     }
 };
 
-template <template <class N> class RD, class N, class... RL>
-using RuleBuiltin = RuleList<RD, N, RL...>;
+template <class N, class... RL>
+using RuleBuiltin = RuleList<N, RL...>;
 
-template <template <class N> class RD, class N, class RX>
+template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
 private:
     static MYPARSER_INLINE const Node *runRegex(
@@ -164,9 +176,9 @@ private:
             auto str = mdata.str();
             input += str.size();
 
-            return new NodeTextTyped<RD<N>>(input, str);
+            return new NodeTextTyped<RuleDef<N>>(input, str);
         } else {
-            return new NodeErrorNativeTyped<RD<N>, ErrorRegex>(input);
+            return new NodeErrorNativeTyped<RuleDef<N>, ErrorRegex>(input);
         }
     }
 
@@ -176,7 +188,7 @@ protected:
     // virtual ~RuleRegex() {}
 
 public:
-    using SelfType = RuleRegex<RD, N, RX>;
+    using SelfType = RuleRegex<N, RX>;
 
     static inline const SelfType *getInstance() {
         static const SelfType instance;
@@ -191,21 +203,21 @@ public:
 
 //////// Cell ////////
 
-template <template <class N> class RD, class TAG = TagNormal>
+template <class N = BuiltinSpace, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
     static const Node *parse(Input &input, const Input &end) {
-        return RD<BuiltinSpace>::parse(input, end);
+        return RuleDef<N>::parse(input, end);
     }
 };
 
-template <template <class N> class RD, class KW, class TAG = TagNormal>
+template <class KW, class N = BuiltinKeyword, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
     static const Node *parse(Input &input, const Input &end) {
         static const std::string keyword = KW::getStr();
 
-        const Node *result = RD<BuiltinKeyword>::parse(input, end);
+        const Node *result = RuleDef<N>::parse(input, end);
 
         if (result->accepted() && result->getFullText() == keyword) {
             return result;
@@ -215,15 +227,15 @@ public:
     }
 };
 
-template <template <class N> class RD, class N, class TAG = TagNormal>
+template <class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
     static const Node *parse(Input &input, const Input &end) {
-        return RD<N>::parse(input, end);
+        return RuleDef<N>::parse(input, end);
     }
 };
 
-template <template <class N> class RD, class E, class TAG = TagNormal>
+template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
     static const Node *parse(Input &input, const Input &end) {
