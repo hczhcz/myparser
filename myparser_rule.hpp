@@ -206,7 +206,7 @@ public:
 template <class N = BuiltinSpace, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
-    static const Node *parse(Input &input, const Input &end) {
+    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
         return RuleDef<N>::parse(input, end);
     }
 };
@@ -214,7 +214,7 @@ public:
 template <class KW, class N = BuiltinKeyword, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
-    static const Node *parse(Input &input, const Input &end) {
+    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
         static const std::string keyword = KW::getStr();
 
         const Node *result = RuleDef<N>::parse(input, end);
@@ -230,7 +230,7 @@ public:
 template <class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
-    static const Node *parse(Input &input, const Input &end) {
+    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
         return RuleDef<N>::parse(input, end);
     }
 };
@@ -238,7 +238,7 @@ public:
 template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
-    static const Node *parse(Input &input, const Input &end) {
+    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
         (void) end;
 
         static const std::string error = E::getStr();
@@ -285,7 +285,7 @@ public:
         }
 
     public:
-        static const Node *parse(Input &input, const Input &end) {
+        static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
             NodeListTyped<LST, I> *result = new NodeListTyped<LST, I>(input);
 
             if (runRule<RL...>(result, input, end)) {
