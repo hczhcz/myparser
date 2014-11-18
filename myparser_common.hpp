@@ -82,22 +82,17 @@ namespace myparser {
 
 // forward declaration
 
-template <class TX = void>
-class NodeList;
-
-template <class TX = void>
-class NodeText;
-
-template <class TX = void>
-class NodeError;
-
-template <class E>
-class NodeErrorNative;
-
-template <class E>
-class NodeErrorWrap;
-
 class Rule;
+
+template <class NT>
+class Pass {
+public:
+    void scanNode(const NT *node) {
+        (void) node;
+
+        // TODO: new file myparser_pass.hpp
+    }
+};
 
 }
 

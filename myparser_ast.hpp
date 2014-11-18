@@ -51,15 +51,9 @@ public:
     inline const Input &getPos() const {
         return pos;
     }
-
-    inline const NodeList<> *castList() const;
-
-    inline const NodeText<> *castText() const;
-
-    inline const NodeError<> *castError() const;
 };
 
-template <class TX> // actually not a template
+template <class TX = void> // actually not a template
 class NodeList: public Node {
 private:
     std::vector<const Node *> children;
@@ -183,7 +177,7 @@ public:
     }
 };
 
-template <class TX> // actually not a template
+template <class TX = void> // actually not a template
 class NodeText: public Node {
 private:
     const std::string text;
@@ -226,12 +220,9 @@ public:
     inline const std::string &getText() const {
         return text;
     }
-
-    template <class T>
-    inline const T &getValue() const = delete; // reserved
 };
 
-template <class TX> // actually not a template
+template <class TX = void> // actually not a template
 class NodeError: public Node {
 public:
     inline NodeError(const Input &input):
@@ -333,27 +324,19 @@ public:
     }
 };
 
-inline const NodeList<> *Node::castList() const {
-    return dynamic_cast<const NodeList<> *>(this);
-}
-
-inline const NodeText<> *Node::castText() const {
-    return dynamic_cast<const NodeText<> *>(this);
-}
-
-inline const NodeError<> *Node::castError() const {
-    return dynamic_cast<const NodeError<> *>(this);
-}
-
 template <class NT, class T>
 class NodeTyped: public T {
 public:
-    using T::T;
+    using SelfType = NodeTyped<NT, T>;
 
-    using RuleType = NT;
+    using T::T;
 
     virtual const Rule *getRule() const {
         return NT::getInstance();
+    }
+
+    virtual void runPass(Pass<SelfType> &pass) const {
+        pass.scanNode(this);
     }
 };
 
