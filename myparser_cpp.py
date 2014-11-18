@@ -55,8 +55,6 @@ def cplusplus_gen(content, mppath, guard):
 
 namespace myparser {
 
-using Parser = RuleDef<BuiltinRoot>;
-
 ''' + content + '''
 
 }

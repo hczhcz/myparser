@@ -6,7 +6,7 @@
 #define MP_STR_0(str) /* none */
 #define MP_STR_1(str) str[0]
 #include "myparser_str_chain.inc"
-#define MP_STR(str, len) StaticStr<MP_STR_##len(str)>
+#define MP_STR(str, len) myparser::StaticStr<MP_STR_##len(str)>
 
 namespace myparser {
 

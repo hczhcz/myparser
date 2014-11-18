@@ -134,15 +134,9 @@ public:
     }
 
     static const Node *parse(Input &input, const Input &end) {
-        // mpDebug(N::getStr());
-        // mpDebug(*input);
-
         return runRule<0, RL...>(input, end);
     }
 };
-
-template <class N, class... RL>
-using RuleBuiltin = RuleList<N, RL...>;
 
 template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
@@ -150,9 +144,6 @@ private:
     static MYPARSER_INLINE const Node *runRegex(
         Input &input, const Input &end
     ) {
-        // mpDebug(N::getStr());
-        // mpDebug(*input);
-
         #if defined(MYPARSER_BOOST_XPRESSIVE)
             static const regex_lib::basic_regex<Input> re =
                 regex_lib::basic_regex<Input>::compile<Input>(
@@ -247,6 +238,8 @@ public:
     }
 };
 
+//////// Misc ////////
+
 template <class... RL>
 class RuleLine {
 public:
@@ -299,6 +292,17 @@ public:
             }
         }
     };
+};
+
+template <class N = BuiltinRoot>
+class Parser: public RuleDef<N> {
+public:
+    using RuleDef<N>::parse;
+
+    static const Node *parse(const std::string input) {
+        Input iter = input.cbegin();
+        return parse(iter, input.cend());
+    }
 };
 
 }
