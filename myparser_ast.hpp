@@ -328,12 +328,10 @@ public:
 template <class N, class T>
 class NodeTyped: public T {
 public:
-    using SelfType = NodeTyped<N, T>;
-
     using T::T;
 
     virtual void runPass(PassProto *pass) const {
-        PassMgr<SelfType>::run(pass, this);
+        PassMgr<>::run(pass, this);
     }
 
     virtual const std::string &getRuleName() const {

@@ -19,45 +19,45 @@ public:
     }
 };
 
-template <class T, size_t I>
-class Pass: PassProto {
+template <size_t I>
+class Pass: public PassProto {
 public:
     MYPARSER_INLINE Pass(): PassProto(I) {}
 
+    template <class T>
     MYPARSER_INLINE void run(const T *node) {
-        //T::need_specialization();
+        // T::need_specialization();
     }
 };
 
-template <class T, size_t I>
-class PassChain {
+template <size_t I = 0>
+class PassMgr {
 public:
+    template <class T>
     static MYPARSER_INLINE void run(
         PassProto *pass, const size_t offset, const T *node
     ) {
         if (offset == 0) {
-            ((Pass<T, I> *) pass)->run(node);
+            ((Pass<I> *) pass)->run(node);
         } else {
-            PassChain<T, I + 1>::run(pass, offset - 1, node);
+            PassMgr<I + 1>::run(pass, offset - 1, node);
         }
+    }
+
+    template <class T>
+    static MYPARSER_INLINE void run(PassProto *pass, const T *node) {
+        run(pass, pass->getId(), node);
     }
 };
 
-template <class T>
-class PassChain<T, max_pass> {
+template <>
+class PassMgr<max_pass> {
 public:
+    template <class T>
     static MYPARSER_INLINE void run(
         PassProto *pass, const size_t offset, const T *node
     ) {
         // never reach
-    }
-};
-
-template <class T>
-class PassMgr {
-public:
-    static MYPARSER_INLINE void run(PassProto *pass, const T *node) {
-        PassChain<T, 0>::run(pass, pass->getId(), node);
     }
 };
 
