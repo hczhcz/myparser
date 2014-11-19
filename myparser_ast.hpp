@@ -22,7 +22,7 @@ public:
 
     virtual bool empty() const = 0;
 
-    virtual const Rule *getRule() const = 0;
+    virtual const std::string &getRuleName() const = 0;
 
     virtual size_t getLen() const = 0;
 
@@ -133,7 +133,7 @@ public:
             (simplify < 1) ? children : children1;
 
         if (simplify < 2) {
-            out << getRule()->getName() << '[';
+            out << getRuleName() << '[';
             out << style_index << getIndex() << style_normal;
             out << ']';
         }
@@ -210,7 +210,7 @@ public:
         (void) indent;
 
         if (simplify < 2) {
-            out << getRule()->getName();
+            out << getRuleName();
             out << style_faint << " - " << style_normal;
         }
 
@@ -268,7 +268,7 @@ public:
         static const std::string error = E::getStr();
 
         if (simplify < 2) {
-            out << getRule()->getName();
+            out << getRuleName();
             out << style_faint << " - " << style_normal;
         }
 
@@ -306,7 +306,7 @@ public:
         static const std::string error = E::getStr();
 
         if (simplify < 2) {
-            out << getRule()->getName();
+            out << getRuleName();
             out << style_faint << " - " << style_normal;
         }
 
@@ -324,19 +324,21 @@ public:
     }
 };
 
-template <class NT, class T>
+template <class N, class T>
 class NodeTyped: public T {
 public:
-    using SelfType = NodeTyped<NT, T>;
+    using SelfType = NodeTyped<N, T>;
 
     using T::T;
 
-    virtual const Rule *getRule() const {
-        return NT::getInstance();
+    virtual void runPass(const size_t action) const {
+        PassMgr::run<SelfType>(this, action);
     }
 
-    virtual void runPass(Pass<SelfType> &pass) const {
-        pass.scanNode(this);
+    virtual const std::string &getRuleName() const {
+        static const std::string name = N::getStr();
+
+        return name;
     }
 };
 

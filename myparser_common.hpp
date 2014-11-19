@@ -84,15 +84,8 @@ namespace myparser {
 
 class Rule;
 
-template <class NT>
-class Pass {
-public:
-    void scanNode(const NT *node) {
-        (void) node;
-
-        // TODO: new file myparser_pass.hpp
-    }
-};
+template <class N>
+class RuleDef;
 
 }
 

@@ -33,9 +33,6 @@ protected:
     inline Rule() {} // force singleton
 
     // virtual ~Rule() {}
-
-public:
-    virtual const std::string &getName() const = 0;
 };
 
 template <class N>
@@ -44,21 +41,6 @@ protected:
     inline RuleNamed(): Rule() {}
 
     // virtual ~RuleNamed() {}
-
-public:
-    using SelfType = RuleNamed<N>;
-
-    static inline const SelfType *getInstance() {
-        static const SelfType instance;
-
-        return &instance;
-    }
-
-    virtual const std::string &getName() const {
-        static const std::string name = N::getStr();
-
-        return name;
-    }
 };
 
 // need specialization
@@ -73,6 +55,9 @@ public:
     }
 };
 
+template <>
+class RuleDef<BuiltinError>: public RuleNamed<BuiltinError> {};
+
 //////// Named ////////
 
 template <class N, class... RL>
@@ -84,7 +69,7 @@ private:
     ) {
         using Member =
             typename R
-            ::template Helper<RuleDef<N>, I>;
+            ::template Helper<N, I>;
 
         Input input_new = input;
 
@@ -116,7 +101,7 @@ private:
     ) {
         (void) end;
 
-        return new NodeErrorNativeTyped<RuleDef<N>, ErrorList>(input);
+        return new NodeErrorNativeTyped<N, ErrorList>(input);
     }
 
 protected:
@@ -125,14 +110,6 @@ protected:
     // virtual ~RuleList() {}
 
 public:
-    using SelfType = RuleList<N, RL...>;
-
-    static inline const SelfType *getInstance() {
-        static const SelfType instance;
-
-        return &instance;
-    }
-
     static const Node *parse(Input &input, const Input &end) {
         return runRule<0, RL...>(input, end);
     }
@@ -167,9 +144,9 @@ private:
             auto str = mdata.str();
             input += str.size();
 
-            return new NodeTextTyped<RuleDef<N>>(input, str);
+            return new NodeTextTyped<N>(input, str);
         } else {
-            return new NodeErrorNativeTyped<RuleDef<N>, ErrorRegex>(input);
+            return new NodeErrorNativeTyped<N, ErrorRegex>(input);
         }
     }
 
@@ -179,14 +156,6 @@ protected:
     // virtual ~RuleRegex() {}
 
 public:
-    using SelfType = RuleRegex<N, RX>;
-
-    static inline const SelfType *getInstance() {
-        static const SelfType instance;
-
-        return &instance;
-    }
-
     static const Node *parse(Input &input, const Input &end) {
         return runRegex(input, end);
     }
@@ -213,7 +182,7 @@ public:
         if (result->accepted() && result->getFullText() == keyword) {
             return result;
         } else {
-            return new NodeErrorWrapTyped<RuleNamed<BuiltinError>, ErrorKeyword>(input, result);
+            return new NodeErrorWrapTyped<BuiltinError, ErrorKeyword>(input, result);
         }
     }
 };
@@ -234,7 +203,7 @@ public:
 
         static const std::string error = E::getStr();
 
-        return new NodeErrorNativeTyped<RuleNamed<BuiltinError>, E>(input);
+        return new NodeErrorNativeTyped<BuiltinError, E>(input);
     }
 };
 
@@ -243,12 +212,12 @@ public:
 template <class... RL>
 class RuleLine {
 public:
-    template <class LST, size_t I>
+    template <class N, size_t I>
     class Helper {
     private:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
-            NodeListTyped<LST, I> *&result, Input &input, const Input &end
+            NodeListTyped<N, I> *&result, Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
                 const Node *current = R::parse(input, end);
@@ -268,7 +237,7 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            NodeListTyped<LST, I> *&result, Input &input, const Input &end
+            NodeListTyped<N, I> *&result, Input &input, const Input &end
         ) {
             (void) result;
             (void) input;
@@ -279,13 +248,13 @@ public:
 
     public:
         static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
-            NodeListTyped<LST, I> *result = new NodeListTyped<LST, I>(input);
+            NodeListTyped<N, I> *result = new NodeListTyped<N, I>(input);
 
             if (runRule<RL...>(result, input, end)) {
                 return result;
             } else {
                 #if defined(MYPARSER_ERROR_LINE)
-                    return new NodeErrorWrapTyped<LST, ErrorLine>(input, result);
+                    return new NodeErrorWrapTyped<N, ErrorLine>(input, result);
                 #else
                     return result;
                 #endif
