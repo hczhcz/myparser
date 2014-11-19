@@ -2,6 +2,7 @@
 #define MYPARSER_AST_HPP
 
 #include "myparser_common.hpp"
+#include "myparser_pass.hpp"
 
 namespace myparser {
 
@@ -21,6 +22,8 @@ public:
     virtual bool accepted() const = 0;
 
     virtual bool empty() const = 0;
+
+    virtual void runPass(PassProto *pass) const = 0;
 
     virtual const std::string &getRuleName() const = 0;
 
@@ -237,8 +240,6 @@ public:
     virtual bool empty() const {
         return false;
     }
-
-    // TODO: virtual function: getErrorMessage()
 };
 
 template <class E>
@@ -331,8 +332,8 @@ public:
 
     using T::T;
 
-    virtual void runPass(const size_t action) const {
-        PassMgr::run<SelfType>(this, action);
+    virtual void runPass(PassProto *pass) const {
+        PassMgr<SelfType>::run(pass, this);
     }
 
     virtual const std::string &getRuleName() const {

@@ -80,6 +80,8 @@ namespace myparser {
     const auto style_normal = "";
 #endif
 
+const size_t max_pass = 64;
+
 // forward declaration
 
 class Rule;
