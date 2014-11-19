@@ -47,12 +47,7 @@ protected:
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
-    static const Node *parse(Input &input, const Input &end) {
-        (void) input;
-        (void) end;
-
-        return N::need_specialization();
-    }
+    static const Node *parse(Input &input, const Input &end);
 };
 
 template <>
@@ -105,7 +100,7 @@ private:
     }
 
 protected:
-    inline RuleList(): RuleNamed<N>() {}
+    MYPARSER_INLINE RuleList(): RuleNamed<N>() {}
 
     // virtual ~RuleList() {}
 
@@ -151,7 +146,7 @@ private:
     }
 
 protected:
-    inline RuleRegex(): RuleNamed<N>() {}
+    MYPARSER_INLINE RuleRegex(): RuleNamed<N>() {}
 
     // virtual ~RuleRegex() {}
 
@@ -268,7 +263,7 @@ class Parser: public RuleDef<N> {
 public:
     using RuleDef<N>::parse;
 
-    static const Node *parse(const std::string input) {
+    static inline const Node *parse(const std::string input) {
         Input iter = input.cbegin();
         return parse(iter, input.cend());
     }

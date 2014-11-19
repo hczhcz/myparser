@@ -27,6 +27,7 @@ public:
     template <class T>
     MYPARSER_INLINE void run(const T *node) {
         // T::need_specialization();
+        // never reach
     }
 };
 
