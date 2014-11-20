@@ -23,7 +23,7 @@ public:
 
     virtual bool empty() const = 0;
 
-    virtual void runPass(PassProto *pass) const = 0;
+    virtual void runPass(PassBase *pass) const = 0;
 
     virtual const std::string &getRuleName() const = 0;
 
@@ -325,13 +325,13 @@ public:
     }
 };
 
-template <class N, class T>
+template <class N, class T, size_t I = 0>
 class NodeTyped: public T {
 public:
     using T::T;
 
-    virtual void runPass(PassProto *pass) const {
-        PassMgr<>::run(pass, this);
+    virtual void runPass(PassBase *pass) const {
+        Pass<I>::call(pass, pass->getId(), this);
     }
 
     virtual const std::string &getRuleName() const {

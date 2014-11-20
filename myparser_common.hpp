@@ -80,9 +80,18 @@ namespace myparser {
     const auto style_normal = "";
 #endif
 
-const size_t max_pass = 32;
+enum {
+    PASS_TEXT,
+    PASS_TREE,
+    PASS_MESSAGE, // input [(list, message), ...] output [lineno:pos message]
+
+    PASS_MAX = 64
+}
 
 // forward declaration
+
+template <size_t I>
+class Pass;
 
 class Rule;
 
