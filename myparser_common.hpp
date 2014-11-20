@@ -86,7 +86,7 @@ enum {
     PASS_MESSAGE, // input [(list, message), ...] output [lineno:pos message]
 
     PASS_MAX = 64
-}
+};
 
 // forward declaration
 
@@ -94,9 +94,6 @@ template <size_t I>
 class Pass;
 
 class Rule;
-
-template <class N>
-class RuleDef;
 
 }
 
