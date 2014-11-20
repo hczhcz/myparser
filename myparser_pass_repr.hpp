@@ -9,32 +9,60 @@ template <>
 class Pass<PASS_REPR>: public PassProto<PASS_REPR> {
 protected:
     std::ostream &out;
-    const bool allowEmpty;
+    const bool optionV;
+    const bool optionC;
     size_t indent;
 
-    virtual void putName(const std::string name) = 0;
-    virtual void putIndex(const size_t index) = 0;
-    virtual void putText(const std::string text) = 0;
-    virtual void putError(const std::string error) = 0;
-    virtual void putBegin() = 0;
-    virtual void putEnd() = 0;
-    virtual void putLnBegin() = 0;
-    virtual void putLnEnd() = 0;
-    virtual void putLn() = 0;
+    virtual void putName(const std::string &name) {
+        (void) name;
+    }
+
+    virtual void putIndex(const size_t index) {
+        (void) index;
+    }
+
+    virtual void putText(const std::string &text) {
+        (void) text;
+    }
+
+    virtual void putError(const std::string &error) {
+        (void) error;
+    }
+
+    virtual void putMainBegin() {}
+
+    virtual void putMainEnd() {}
+
+    virtual void putPlaceHolder() {}
+
+    virtual void putBegin() {}
+
+    virtual void putEnd() {}
+
+    virtual void putLnBegin() {}
+
+    virtual void putLnEnd() {}
+
+    virtual void putLn(const bool first) {
+        (void) first;
+    }
 
 public:
-    inline Pass(std::ostream &target, const bool verbose):
-        PassProto<PASS_REPR>(), out(target), allowEmpty(verbose), indent(0) {}
+    inline Pass(std::ostream &target, const bool verbose, const bool compact):
+        PassProto<PASS_REPR>(), out(target),
+        optionV(verbose), optionC(compact), indent(0) {}
 
     // virtual ~Pass() {}
 
     void run(const NodeList<> *node) {
+        putMainBegin();
+
         putName(node->getRuleName());
         putIndex(node->getIndex());
 
         std::vector<const Node *> children1;
 
-        if (!allowEmpty) {
+        if (!optionV) {
             for (const Node *child: node->getChildren()) {
                 if (!child->empty()) {
                     children1.push_back(child);
@@ -43,90 +71,88 @@ public:
         }
 
         const std::vector<const Node *> &children =
-            allowEmpty ? node->getChildren() : children1;
+            optionV ? node->getChildren() : children1;
 
-        if (children.size() == 1) {
+        if (optionC && children.size() == 1) {
             putBegin();
             children[0]->runPass(this);
             putEnd();
         } else {
+            putPlaceHolder();
+
             putLnBegin();
+            ++indent;
+
+            bool first = true;
             for (const Node *child: children) {
-                ++indent;
-                putLn();
+                putLn(first);
+                first = false;
                 child->runPass(this);
-                --indent;
             }
+
+            --indent;
             putLnEnd();
         }
+
+        putMainEnd();
     }
 
     void run(const NodeText<> *node) {
+        putMainBegin();
+
         putName(node->getRuleName());
 
         putBegin();
         putText(node->getText());
         putEnd();
+
+        putMainEnd();
     }
 
     template <class E>
     void run(const NodeErrorNative<E> *node) {
+        putMainBegin();
+
         putName(node->getRuleName());
 
         putBegin();
         putError(E::getStr());
         putEnd();
+
+        putMainEnd();
     }
 
     template <class E>
     void run(const NodeErrorWrap<E> *node) {
+        putMainBegin();
+
         putName(node->getRuleName());
 
         putBegin();
         putError(E::getStr());
         putEnd();
 
+        putLnBegin();
         ++indent;
-        putLn();
+        putLn(true);
         node->getChild()->runPass(this);
         --indent;
+        putLnEnd();
+
+        putMainEnd();
     }
 };
 
 template <class TX = void> // actually not a template
 class PassReprText: public Pass<PASS_REPR> {
 protected:
-    virtual void putName(const std::string name) {
-        (void) name;
-    }
-
-    virtual void putIndex(const size_t index) {
-        (void) index;
-    }
-
-    virtual void putText(const std::string text) {
+    virtual void putText(const std::string &text) {
         out << text;
     }
 
-    virtual void putError(const std::string error) {
-        (void) error;
-    }
-
-    virtual void putBegin() {}
-
-    virtual void putEnd() {}
-
-    virtual void putLnBegin() {}
-
-    virtual void putLnEnd() {}
-
-    virtual void putLn() {}
-
-    virtual void putError() {}
-
 public:
     inline PassReprText(std::ostream &target):
-        Pass<PASS_REPR>(target, true) {}
+        Pass<PASS_REPR>(target, true, false) {}
 
     // virtual ~PassReprText() {}
 };
@@ -134,33 +160,21 @@ public:
 template <class TX = void> // actually not a template
 class PassReprSimple: public Pass<PASS_REPR> {
 protected:
-    virtual void putName(const std::string name) {
-        (void) name;
-    }
-
-    virtual void putIndex(const size_t index) {
-        (void) index;
-    }
-
-    virtual void putText(const std::string text) {
+    virtual void putText(const std::string &text) {
         out << style_keyword << text << style_normal;
     }
 
-    virtual void putError(const std::string error) {
+    virtual void putError(const std::string &error) {
         out << style_error << "ERROR: " << style_normal << error;
     }
 
-    virtual void putBegin() {}
-
-    virtual void putEnd() {}
-
-    virtual void putLnBegin() {
+    virtual void putPlaceHolder() {
         out << "=>";
     }
 
-    virtual void putLnEnd() {}
+    virtual void putLn(const bool first) {
+        (void) first;
 
-    virtual void putLn() {
         out << '\n';
         for (size_t i = 0; i < indent; ++i) {
             out << "    ";
@@ -168,8 +182,11 @@ protected:
     }
 
 public:
-    inline PassReprSimple(std::ostream &target, const bool verbose = false):
-        Pass<PASS_REPR>(target, verbose) {}
+    inline PassReprSimple(
+        std::ostream &target,
+        const bool verbose = false, const bool compact = true
+    ):
+        Pass<PASS_REPR>(target, verbose, compact) {}
 
     // virtual ~PassReprSimple() {}
 };
@@ -177,16 +194,8 @@ public:
 template <class TX = void> // actually not a template
 class PassReprFull: public Pass<PASS_REPR> {
 protected:
-    virtual void putName(const std::string name) {
+    virtual void putName(const std::string &name) {
         out << name;
-    }
-
-    virtual void putText(const std::string text) {
-        out << style_keyword << text << style_normal;
-    }
-
-    virtual void putError(const std::string error) {
-        out << style_error << "ERROR: " << style_normal << error;
     }
 
     virtual void putIndex(const size_t index) {
@@ -195,17 +204,21 @@ protected:
         out << ']';
     }
 
+    virtual void putText(const std::string &text) {
+        out << style_keyword << text << style_normal;
+    }
+
+    virtual void putError(const std::string &error) {
+        out << style_error << "ERROR: " << style_normal << error;
+    }
+
     virtual void putBegin() {
         out << style_faint << " - " << style_normal;
     }
 
-    virtual void putEnd() {}
+    virtual void putLn(const bool first) {
+        (void) first;
 
-    virtual void putLnBegin() {}
-
-    virtual void putLnEnd() {}
-
-    virtual void putLn() {
         out << '\n';
         for (size_t i = 0; i < indent; ++i) {
             out << "    ";
@@ -213,10 +226,81 @@ protected:
     }
 
 public:
-    inline PassReprFull(std::ostream &target, const bool verbose = false):
-        Pass<PASS_REPR>(target, verbose) {}
+    inline PassReprFull(
+        std::ostream &target,
+        const bool verbose = false, const bool compact = true
+    ):
+        Pass<PASS_REPR>(target, verbose, compact) {}
 
     // virtual ~PassReprFull() {}
+};
+
+template <class TX = void> // actually not a template
+class PassReprJSON: public Pass<PASS_REPR> {
+protected:
+    virtual void putName(const std::string &name) {
+        putLn1();
+        out << "\"name\": \"" << name << "\","; // TODO: escape?
+    }
+
+    virtual void putIndex(const size_t index) {
+        putLn1();
+        out << "\"index\": \"" << index << "\",";
+    }
+
+    virtual void putText(const std::string &text) {
+        putLn1();
+        out << "\"text\": \"" << text << "\",";
+    }
+
+    virtual void putError(const std::string &error) {
+        putLn1();
+        out << "\"error\": \"" << error << "\",";
+    }
+
+    virtual void putMainBegin() {
+        out << "{";
+        ++indent; // extra
+    }
+
+    virtual void putMainEnd() {
+        --indent; // extra
+        putLn1();
+        out << "}";
+    }
+
+    virtual void putLnBegin() {
+        putLn1();
+        out << "\"children\": [";
+        --indent; // extra
+    }
+
+    virtual void putLnEnd() {
+        ++indent; // extra
+        out << "]";
+    }
+
+    virtual void putLn(const bool first) {
+        if (!first) {
+            out << ',';
+            putLn1();
+        }
+    }
+
+    void putLn1() {
+        out << '\n';
+        for (size_t i = 0; i < indent; ++i) {
+            out << "    ";
+        }
+    }
+
+public:
+    inline PassReprJSON(
+        std::ostream &target, const bool verbose = false
+    ):
+        Pass<PASS_REPR>(target, verbose, false) {}
+
+    // virtual ~PassReprJSON() {}
 };
 
 }
