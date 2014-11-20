@@ -170,11 +170,9 @@ template <class KW, class N = BuiltinKeyword, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
     static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
-        static const std::string keyword = KW::getStr();
-
         const Node *result = RuleDef<N>::parse(input, end);
 
-        if (result->accepted() && result->getFullText() == keyword) {
+        if (result->accepted() && result->getFullText() == KW::getStr()) {
             return result;
         } else {
             return new NodeErrorWrapTyped<BuiltinError, ErrorKeyword>(input, result);
@@ -195,8 +193,6 @@ class RuleItemError: public TAG {
 public:
     static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
         (void) end;
-
-        static const std::string error = E::getStr();
 
         return new NodeErrorNativeTyped<BuiltinError, E>(input);
     }

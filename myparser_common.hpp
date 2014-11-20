@@ -81,8 +81,7 @@ namespace myparser {
 #endif
 
 enum {
-    PASS_TEXT,
-    PASS_TREE,
+    PASS_REPR,
     PASS_MESSAGE, // input [(list, message), ...] output [lineno:pos message]
 
     PASS_MAX = 64
@@ -92,8 +91,6 @@ enum {
 
 template <size_t I>
 class Pass;
-
-class Rule;
 
 }
 

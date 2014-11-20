@@ -266,7 +266,7 @@ public:
     ) const {
         (void) indent;
 
-        static const std::string error = E::getStr();
+        static const std::string &error = E::getStr();
 
         if (simplify < 2) {
             out << getRuleName();
@@ -304,7 +304,7 @@ public:
     virtual void getTree(
         std::ostream &out, size_t indent = 0, size_t simplify = 1
     ) const {
-        static const std::string error = E::getStr();
+        static const std::string &error = E::getStr();
 
         if (simplify < 2) {
             out << getRuleName();
@@ -335,9 +335,7 @@ public:
     }
 
     virtual const std::string &getRuleName() const {
-        static const std::string name = N::getStr();
-
-        return name;
+        return N::getStr();
     }
 };
 
