@@ -12,7 +12,9 @@
 
     #define MYPARSER_AST_CCC
     // #define MYPARSER_ERROR_LINE
-    #define MYPARSER_FORCE_INLINE
+    #if defined(__GNUC__) || defined(__clang__)
+        #define MYPARSER_FORCE_INLINE
+    #endif
 
     // use boost instead of libstdc++
     #if defined(__GLIBCXX__)
@@ -48,7 +50,7 @@
 #endif
 
 #if defined(MYPARSER_FORCE_INLINE)
-    #define MYPARSER_INLINE __attribute__((always_inline)) inline
+    #define MYPARSER_INLINE __attribute__((__always_inline__)) inline
 #else
     #define MYPARSER_INLINE inline
 #endif

@@ -14,8 +14,6 @@
     defined(WINDOWS) || defined(__WINDOWS__)
         #define CCC_WINDOWS
         #include <windows.h>
-
-        #error "not supported yet"
 #endif
 
 namespace ccc {
@@ -96,14 +94,7 @@ static std::ostream &operator<<(std::ostream &s, const Style &style) {
     #if defined(CCC_UNIX)
         return s << '\x1b' << '[' << (int) style << 'm';
     #elif defined(CCC_WINDOWS)
-        // TODO
-
-        assert(s == std::cout);
-
-        HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        CONSOLE_SCREEN_BUFFER_INFO buf_info;
-        GetConsoleScreenBufferInfo(handle, &buf_info);
-        SetConsoleTextAttribute(hStdOut, /* TODO */);
+        // not implemented
 
         return s;
     #endif
