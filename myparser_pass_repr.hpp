@@ -240,24 +240,76 @@ public:
 template <class TX = void> // actually not a template
 class PassReprJSON: public Pass<PASS_REPR> {
 protected:
+    void putStrEscaped(const std::string &str) {
+        for (const char c: str) {
+            switch (c) {
+            // case '\0':
+                // never reach
+            case '\b':
+                out << "\\b";
+                break;
+            case '\t':
+                out << "\\t";
+                break;
+            case '\n':
+                out << "\\n";
+                break;
+            case '\v':
+                out << "\\v";
+                break;
+            case '\f':
+                out << "\\f";
+                break;
+            case '\r':
+                out << "\\r";
+                break;
+            case '\"':
+                out << "\\\"";
+                break;
+            case '\'':
+                out << "\\\'";
+                break;
+            case '\\':
+                out << "\\\\";
+                break;
+            case '\x7F':
+                out << "\\x7F";
+                break;
+            default:
+                if (c < '\x10') {
+                    out << "\\x0" << ("0123456789ABCDEF"[c & 0xF]);
+                } else if (c < '\x20') {
+                    out << "\\x1" << ("0123456789ABCDEF"[c & 0xF]);
+                } else {
+                    out << c;
+                }
+                break;
+            }
+        }
+    }
+
     virtual void putName(const std::string &name) {
         putLn1();
-        out << "\"name\": \"" << name << "\","; // TODO: escape?
+        out << "\"rulename\": \"" << name << "\",";
     }
 
     virtual void putIndex(const size_t index) {
         putLn1();
-        out << "\"index\": \"" << index << "\",";
+        out << "\"ruleindex\": \"" << index << "\",";
     }
 
     virtual void putText(const std::string &text) {
         putLn1();
-        out << "\"text\": \"" << text << "\",";
+        out << "\"text\": \"";
+        putStrEscaped(text);
+        out << "\",";
     }
 
     virtual void putError(const std::string &error) {
         putLn1();
-        out << "\"error\": \"" << error << "\",";
+        out << "\"error\": \"";
+        putStrEscaped(error);
+        out << "\",";
     }
 
     virtual void putMainBegin() {
