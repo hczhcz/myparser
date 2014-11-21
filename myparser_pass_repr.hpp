@@ -7,10 +7,12 @@ namespace myparser {
 
 template <>
 class Pass<PASS_REPR>: public PassProto<PASS_REPR> {
-protected:
-    std::ostream &out;
+private:
     const bool optionV;
     const bool optionC;
+
+protected:
+    std::ostream &out;
     size_t indent;
 
     virtual void putName(const std::string &name) {
@@ -49,8 +51,8 @@ protected:
 
 public:
     inline Pass(std::ostream &target, const bool verbose, const bool compact):
-        PassProto<PASS_REPR>(), out(target),
-        optionV(verbose), optionC(compact), indent(0) {}
+        PassProto<PASS_REPR>(), optionV(verbose), optionC(compact),
+        out(target), indent(0) {}
 
     // virtual ~Pass() {}
 

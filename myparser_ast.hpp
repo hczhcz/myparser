@@ -14,10 +14,11 @@ private:
 
     inline Node() = delete;
 
-public:
+protected:
     inline Node(const Input &input): pos(input) {}
 
-    virtual ~Node() {}
+public:
+    virtual ~Node() {} // destructable (public)
 
     virtual bool accepted() const = 0;
 
@@ -113,7 +114,10 @@ public:
 template <size_t I>
 class NodeListIndexed: public NodeList<> {
 public:
-    using NodeList<>::NodeList;
+    inline NodeListIndexed(const Input &input):
+        NodeList(input) {}
+
+    // virtual ~NodeListIndexed() {}
 
     virtual size_t getIndex() const {
         return I;
@@ -129,7 +133,7 @@ public:
     inline NodeText(const Input &input, const std::string &value):
         Node(input), text(value) {}
 
-    virtual ~NodeText() {}
+    // virtual ~NodeText() {}
 
     virtual bool accepted() const {
         return true;
@@ -154,12 +158,13 @@ public:
 
 template <class TX = void> // actually not a template
 class NodeError: public Node {
-public:
+protected:
     inline NodeError(const Input &input):
         Node(input) {}
 
-    virtual ~NodeError() {}
+    // virtual ~NodeError() {}
 
+public:
     virtual bool accepted() const {
         return false;
     }
@@ -172,12 +177,12 @@ public:
 template <class E>
 class NodeErrorNative: public NodeError<> {
 public:
-    using ErrorType = E;
-
     inline NodeErrorNative(const Input &input):
         NodeError(input) {}
 
-    virtual ~NodeErrorNative() {}
+    // virtual ~NodeErrorNative() {}
+
+    using ErrorType = E;
 
     virtual size_t getLen() const {
         return 0;
@@ -195,14 +200,14 @@ private:
     const Node *child;
 
 public:
-    using ErrorType = E;
-
     inline NodeErrorWrap(const Input &input, const Node *value):
         NodeError<>(input), child(value) {}
 
     virtual ~NodeErrorWrap() {
         delete child;
     }
+
+    using ErrorType = E;
 
     virtual size_t getLen() const {
         return child->getLen();

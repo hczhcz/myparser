@@ -12,10 +12,10 @@ namespace myparser {
 
 template <char... C>
 class StaticStr {
-protected:
-    inline StaticStr() {} // force static
+private:
+    inline StaticStr() = delete; // force static
 
-    // virtual ~StaticStr() {}
+    // virtual ~StaticStr() = delete;
 
 public:
     static inline const std::string &getStr() {

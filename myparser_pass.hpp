@@ -9,11 +9,12 @@ class PassBase {
 private:
     size_t id;
 
-public:
+protected:
     inline PassBase(const size_t pass): id(pass) {}
 
     // virtual ~PassBase() {}
 
+public:
     inline size_t getId() {
         return id;
     }
@@ -30,12 +31,12 @@ public:
 
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase *pass, const size_t offset, const T *node
+        PassBase *pass, const size_t target, const T *node
     ) {
-        if (offset == 0) {
+        if (target == I) {
             ((Pass<I> *) pass)->run(node);
         } else {
-            Pass<I + 1>::call(pass, offset - 1, node);
+            Pass<I + 1>::call(pass, target, node);
         }
     }
 };
@@ -45,9 +46,9 @@ class Pass {
 public:
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase *pass, const size_t offset, const T *node
+        PassBase *pass, const size_t target, const T *node
     ) {
-        Pass<I + 1>::call(pass, offset - 1, node);
+        Pass<I + 1>::call(pass, target, node);
     }
 };
 
@@ -56,11 +57,11 @@ class Pass<PASS_MAX> {
 public:
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase *pass, const size_t offset, const T *node
+        PassBase *pass, const size_t target, const T *node
     ) {
         // never reach
         (void) pass;
-        (void) offset;
+        (void) target;
         (void) node;
     }
 };
