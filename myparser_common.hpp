@@ -83,10 +83,11 @@ namespace myparser {
 #endif
 
 enum {
+    PASS_FILTER,
     PASS_REPR,
     PASS_MESSAGE, // input [(list, message), ...] output [lineno:pos message]
 
-    PASS_MAX = 64
+    PASS_FIN = 64
 };
 
 // forward declaration

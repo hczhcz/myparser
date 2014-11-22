@@ -53,7 +53,7 @@ public:
 };
 
 template <>
-class Pass<PASS_MAX> {
+class Pass<PASS_FIN> {
 public:
     template <class T>
     static MYPARSER_INLINE void call(
