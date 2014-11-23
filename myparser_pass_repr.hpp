@@ -276,9 +276,9 @@ protected:
                 out << "\\x7F";
                 break;
             default:
-                if (c < '\x10') {
+                if ('\0' <= c && c < '\x10') {
                     out << "\\x0" << ("0123456789ABCDEF"[c & 0xF]);
-                } else if (c < '\x20') {
+                } else if ('\x10' <= c && c < '\x20') {
                     out << "\\x1" << ("0123456789ABCDEF"[c & 0xF]);
                 } else {
                     out << c;
@@ -331,7 +331,7 @@ protected:
 
     virtual void putLnEnd() {
         ++indent; // extra
-        out << "]";
+        out << "],";
     }
 
     virtual void putLn(const bool first) {
