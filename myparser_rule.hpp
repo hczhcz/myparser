@@ -82,6 +82,7 @@ private:
                 delete next.second;
                 return {next.first, current.second};
             } else {
+                delete current.second;
                 return next;
             }
         }
@@ -182,6 +183,10 @@ public:
         if (current.first && current.first->getFullText() == KW::getStr()) {
             return current;
         } else {
+            if (current.first) {
+                delete current.first;
+            }
+
             if (current.second) {
                 return {
                     nullptr,
@@ -243,9 +248,14 @@ public:
                         result->putChild(current.second);
                         return false;
                     } else {
+                        delete current.second;
                         break;
                     }
                 } else {
+                    if (current.second) {
+                        delete current.second;
+                    }
+
                     result->putChild(current.first);
                 }
             }
