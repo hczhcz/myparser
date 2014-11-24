@@ -47,7 +47,7 @@ protected:
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
-    static const Node *parse(Input &input, const Input &end);
+    static const Node *parse(Input &input, const Input &end, Node *&err);
 };
 
 template <>
@@ -60,22 +60,24 @@ class RuleList: public RuleNamed<N> {
 private:
     template <size_t I, class R, class... Rx>
     static MYPARSER_INLINE const Node *runRule(
-        Input &input, const Input &end
+        Input &input, const Input &end, Node *&err
     ) {
         using Member =
             typename R
             ::template Helper<N, I>;
 
-        Input input_new = input;
+        Input input_rev = input;
+        Node *err_rev = err;
 
-        const Node *current = Member::parse(input_new, end);
+        const Node *current = Member::parse(input, end, err);
 
         if (current->accepted()) {
-            input = input_new;
-
             return current;
         } else {
-            const Node *later = runRule<I + 1, Rx...>(input, end);
+            input = input_rev;
+            err = err_rev;
+
+            const Node *later = runRule<I + 1, Rx...>(input, end, err);
 
             // select the best one
             if (later->accepted() || later->getPos() > current->getPos()) {
@@ -92,9 +94,10 @@ private:
 
     template <size_t I, std::nullptr_t P = nullptr> // iteration finished
     static MYPARSER_INLINE const Node *runRule(
-        Input &input, const Input &end
+        Input &input, const Input &end, Node *&err
     ) {
         (void) end;
+        (void) err;
 
         return new NodeErrorNativeTyped<N, ErrorList>(input);
     }
@@ -105,8 +108,8 @@ protected:
     // virtual ~RuleList() {}
 
 public:
-    static const Node *parse(Input &input, const Input &end) {
-        return runRule<0, RL...>(input, end);
+    static const Node *parse(Input &input, const Input &end, Node *&err) {
+        return runRule<0, RL...>(input, end, err);
     }
 };
 
@@ -151,7 +154,9 @@ protected:
     // virtual ~RuleRegex() {}
 
 public:
-    static const Node *parse(Input &input, const Input &end) {
+    static const Node *parse(Input &input, const Input &end, Node *&err) {
+        (void) err;
+
         return runRegex(input, end);
     }
 };
@@ -161,16 +166,20 @@ public:
 template <class N = BuiltinSpace, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
-        return RuleDef<N>::parse(input, end);
+    static MYPARSER_INLINE const Node *parse(
+        Input &input, const Input &end, Node *&err
+    ) {
+        return RuleDef<N>::parse(input, end, err);
     }
 };
 
 template <class KW, class N = BuiltinKeyword, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
-        const Node *result = RuleDef<N>::parse(input, end);
+    static MYPARSER_INLINE const Node *parse(
+        Input &input, const Input &end, Node *&err
+    ) {
+        const Node *result = RuleDef<N>::parse(input, end, err);
 
         if (result->accepted() && result->getFullText() == KW::getStr()) {
             return result;
@@ -183,16 +192,21 @@ public:
 template <class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
-        return RuleDef<N>::parse(input, end);
+    static MYPARSER_INLINE const Node *parse(
+        Input &input, const Input &end, Node *&err
+    ) {
+        return RuleDef<N>::parse(input, end, err);
     }
 };
 
 template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
+    static MYPARSER_INLINE const Node *parse(
+        Input &input, const Input &end, Node *&err
+    ) {
         (void) end;
+        (void) err;
 
         return new NodeErrorNativeTyped<BuiltinError, E>(input);
     }
@@ -208,10 +222,11 @@ public:
     private:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
-            NodeListTyped<N, I> *&result, Input &input, const Input &end
+            NodeListTyped<N, I> *&result,
+            Input &input, const Input &end, Node *&err
         ) {
             for (size_t i = 0; i < R::most; ++i) {
-                const Node *current = R::parse(input, end);
+                const Node *current = R::parse(input, end, err);
 
                 result->putChild(current);
                 if (!current->accepted()) {
@@ -223,25 +238,29 @@ public:
                 }
             }
 
-            return runRule<Rx...>(result, input, end);
+            return runRule<Rx...>(result, input, end, err);
         }
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            NodeListTyped<N, I> *&result, Input &input, const Input &end
+            NodeListTyped<N, I> *&result,
+            Input &input, const Input &end, Node *&err
         ) {
             (void) result;
             (void) input;
             (void) end;
+            (void) err;
 
             return true;
         }
 
     public:
-        static MYPARSER_INLINE const Node *parse(Input &input, const Input &end) {
+        static MYPARSER_INLINE const Node *parse(
+            Input &input, const Input &end, Node *&err
+        ) {
             NodeListTyped<N, I> *result = new NodeListTyped<N, I>(input);
 
-            if (runRule<RL...>(result, input, end)) {
+            if (runRule<RL...>(result, input, end, err)) {
                 return result;
             } else {
                 #if defined(MYPARSER_ERROR_LINE)
@@ -259,8 +278,17 @@ class Parser: public RuleDef<N> {
 public:
     using RuleDef<N>::parse;
 
+    static inline const Node *parse(Input &input, const Input &end) {
+        Node *err = new NodeErrorNativeTyped<N, ErrorList>(input);
+
+        const Node *result = parse(input, end, err);
+
+        if (result->accepted()) ? result : err;
+    }
+
     static inline const Node *parse(const std::string input) {
         Input iter = input.cbegin();
+
         return parse(iter, input.cend());
     }
 };
