@@ -15,7 +15,6 @@ using BuiltinError = MP_STR("error", 5);
 using ErrorList = MP_STR("Nothing matched", 15);
 using ErrorRegex = MP_STR("Regex not matched", 17);
 using ErrorKeyword = MP_STR("Bad keyword", 11);
-using ErrorLine = MP_STR("Longest bad match", 17);
 
 template <size_t L, size_t M>
 class Tag {
@@ -275,9 +274,7 @@ public:
             if (runRule<RL...>(result, input, end)) {
                 return {result, nullptr};
             } else {
-                return {
-                    nullptr, new NodeErrorWrapTyped<N, ErrorLine>(input, result)
-                };
+                return {nullptr, result};
             }
         }
     };
