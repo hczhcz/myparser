@@ -11,7 +11,6 @@
     // parser
 
     #define MYPARSER_AST_CCC
-    // #define MYPARSER_ERROR_LINE
     #if defined(__GNUC__) || defined(__clang__)
         #define MYPARSER_FORCE_INLINE
     #endif

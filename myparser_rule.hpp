@@ -47,7 +47,7 @@ protected:
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
-    static const Node *parse(Input &input, const Input &end, Node *&err);
+    static std::pair<Node *, Node *> parse(Input &input, const Input &end);
 };
 
 template <>
@@ -59,47 +59,44 @@ template <class N, class... RL>
 class RuleList: public RuleNamed<N> {
 private:
     template <size_t I, class R, class... Rx>
-    static MYPARSER_INLINE const Node *runRule(
-        Input &input, const Input &end, Node *&err
+    static MYPARSER_INLINE std::pair<Node *, Node *> runRule(
+        Input &input, const Input &end
     ) {
         using Member =
             typename R
             ::template Helper<N, I>;
 
         Input input_rev = input;
-        Node *err_rev = err;
 
-        const Node *current = Member::parse(input, end, err);
+        auto current = Member::parse(input, end);
 
-        if (current->accepted()) {
+        if (current.first) {
             return current;
         } else {
             input = input_rev;
-            err = err_rev;
 
-            const Node *later = runRule<I + 1, Rx...>(input, end, err);
+            auto next = runRule<I + 1, Rx...>(input, end);
 
-            // select the best one
-            if (later->accepted() || later->getPos() > current->getPos()) {
-                delete current;
-
-                return later;
+            if (!next.second) {
+                return {next.first, current.second};
+            } else if (current.second->getPos() >= next.second->getPos()) {
+                delete next.second;
+                return {next.first, current.second};
             } else {
-                delete later;
-
-                return current;
+                return next;
             }
         }
     }
 
     template <size_t I, std::nullptr_t P = nullptr> // iteration finished
-    static MYPARSER_INLINE const Node *runRule(
-        Input &input, const Input &end, Node *&err
+    static MYPARSER_INLINE std::pair<Node *, Node *> runRule(
+        Input &input, const Input &end
     ) {
         (void) end;
-        (void) err;
 
-        return new NodeErrorNativeTyped<N, ErrorList>(input);
+        return {
+            nullptr, new NodeErrorNativeTyped<N, ErrorList>(input)
+        };
     }
 
 protected:
@@ -108,15 +105,15 @@ protected:
     // virtual ~RuleList() {}
 
 public:
-    static const Node *parse(Input &input, const Input &end, Node *&err) {
-        return runRule<0, RL...>(input, end, err);
+    static std::pair<Node *, Node *> parse(Input &input, const Input &end) {
+        return runRule<0, RL...>(input, end);
     }
 };
 
 template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
 private:
-    static MYPARSER_INLINE const Node *runRegex(
+    static MYPARSER_INLINE std::pair<Node *, Node *> runRegex(
         Input &input, const Input &end
     ) {
         #if defined(MYPARSER_BOOST_XPRESSIVE)
@@ -142,9 +139,13 @@ private:
             auto str = mdata.str();
             input += str.size();
 
-            return new NodeTextTyped<N>(input, str);
+            return {
+                new NodeTextTyped<N>(input, str), nullptr
+            };
         } else {
-            return new NodeErrorNativeTyped<N, ErrorRegex>(input);
+            return {
+                nullptr, new NodeErrorNativeTyped<N, ErrorRegex>(input)
+            };
         }
     }
 
@@ -154,9 +155,7 @@ protected:
     // virtual ~RuleRegex() {}
 
 public:
-    static const Node *parse(Input &input, const Input &end, Node *&err) {
-        (void) err;
-
+    static std::pair<Node *, Node *> parse(Input &input, const Input &end) {
         return runRegex(input, end);
     }
 };
@@ -166,25 +165,35 @@ public:
 template <class N = BuiltinSpace, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(
-        Input &input, const Input &end, Node *&err
+    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
     ) {
-        return RuleDef<N>::parse(input, end, err);
+        return RuleDef<N>::parse(input, end);
     }
 };
 
 template <class KW, class N = BuiltinKeyword, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(
-        Input &input, const Input &end, Node *&err
+    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
     ) {
-        const Node *result = RuleDef<N>::parse(input, end, err);
+        auto current = RuleDef<N>::parse(input, end);
 
-        if (result->accepted() && result->getFullText() == KW::getStr()) {
-            return result;
+        if (current.first && current.first->getFullText() == KW::getStr()) {
+            return current;
         } else {
-            return new NodeErrorWrapTyped<BuiltinError, ErrorKeyword>(input, result);
+            if (current.second) {
+                return {
+                    nullptr,
+                    new NodeErrorWrapTyped<BuiltinError, ErrorKeyword>(input, current.second)
+                };
+            } else {
+                return {
+                    nullptr,
+                    new NodeErrorNativeTyped<BuiltinError, ErrorKeyword>(input)
+                };
+            }
         }
     }
 };
@@ -192,23 +201,25 @@ public:
 template <class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(
-        Input &input, const Input &end, Node *&err
+    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
     ) {
-        return RuleDef<N>::parse(input, end, err);
+        return RuleDef<N>::parse(input, end);
     }
 };
 
 template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
-    static MYPARSER_INLINE const Node *parse(
-        Input &input, const Input &end, Node *&err
+    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
     ) {
         (void) end;
-        (void) err;
 
-        return new NodeErrorNativeTyped<BuiltinError, E>(input);
+        return {
+            nullptr,
+            new NodeErrorNativeTyped<BuiltinError, E>(input)
+        };
     }
 };
 
@@ -223,70 +234,73 @@ public:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
             NodeListTyped<N, I> *&result,
-            Input &input, const Input &end, Node *&err
+            Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
-                const Node *current = R::parse(input, end, err);
+                auto current = R::parse(input, end);
 
-                result->putChild(current);
-                if (!current->accepted()) {
+                if (!current.first) {
                     if (i < R::least) {
+                        result->putChild(current.second);
                         return false;
                     } else {
                         break;
                     }
+                } else {
+                    result->putChild(current.first);
                 }
             }
 
-            return runRule<Rx...>(result, input, end, err);
+            return runRule<Rx...>(result, input, end);
         }
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
             NodeListTyped<N, I> *&result,
-            Input &input, const Input &end, Node *&err
+            Input &input, const Input &end
         ) {
             (void) result;
             (void) input;
             (void) end;
-            (void) err;
 
             return true;
         }
 
     public:
-        static MYPARSER_INLINE const Node *parse(
-            Input &input, const Input &end, Node *&err
+        static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+            Input &input, const Input &end
         ) {
             NodeListTyped<N, I> *result = new NodeListTyped<N, I>(input);
 
-            if (runRule<RL...>(result, input, end, err)) {
-                return result;
+            if (runRule<RL...>(result, input, end)) {
+                return {result, nullptr};
             } else {
-                #if defined(MYPARSER_ERROR_LINE)
-                    return new NodeErrorWrapTyped<N, ErrorLine>(input, result);
-                #else
-                    return result;
-                #endif
+                return {
+                    nullptr, new NodeErrorWrapTyped<N, ErrorLine>(input, result)
+                };
             }
         }
     };
 };
 
 template <class N = BuiltinRoot>
-class Parser: public RuleDef<N> {
+class Parser {
 public:
-    using RuleDef<N>::parse;
+    static inline Node *parse(Input &input, const Input &end) {
+        auto current = RuleDef<N>::parse(input, end);
 
-    static inline const Node *parse(Input &input, const Input &end) {
-        Node *err = new NodeErrorNativeTyped<N, ErrorList>(input);
+        if (current.first) {
+            if (current.second) {
+                delete current.second;
+            }
 
-        const Node *result = parse(input, end, err);
-
-        if (result->accepted()) ? result : err;
+            return current.first;
+        } else {
+            return current.second;
+        }
     }
 
-    static inline const Node *parse(const std::string input) {
+    static inline Node *parse(const std::string input) {
         Input iter = input.cbegin();
 
         return parse(iter, input.cend());

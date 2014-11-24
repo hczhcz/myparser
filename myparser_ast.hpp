@@ -20,8 +20,6 @@ protected:
 public:
     virtual ~Node() {} // destructable (public)
 
-    virtual bool accepted() const = 0;
-
     virtual bool empty() const = 0;
 
     virtual void runPass(PassBase *pass) const = 0;
@@ -58,20 +56,6 @@ public:
         for (const Node *child: children) {
             delete child;
         }
-    }
-
-    virtual bool accepted() const {
-        #if defined(MYPARSER_ERROR_LINE)
-            return true;
-        #else
-            for (const Node *child: children) {
-                if (!child->accepted()) {
-                    return false;
-                }
-            }
-
-            return true;
-        #endif
     }
 
     virtual bool empty() const {
@@ -135,10 +119,6 @@ public:
 
     // virtual ~NodeText() {}
 
-    virtual bool accepted() const {
-        return true;
-    }
-
     virtual bool empty() const {
         return text.size() == 0;
     }
@@ -165,10 +145,6 @@ protected:
     // virtual ~NodeError() {}
 
 public:
-    virtual bool accepted() const {
-        return false;
-    }
-
     virtual bool empty() const {
         return false;
     }
