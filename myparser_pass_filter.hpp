@@ -13,7 +13,7 @@ public:
     // virtual ~Pass() {}
 
     template <class N, class T>
-    void run(const NodeTyped<N, T> *node) {
+    void run(const NodeTypedProto<N, T> *node) {
         // TODO
         (void) node;
     }

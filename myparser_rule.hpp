@@ -16,6 +16,27 @@ using ErrorList = MP_STR("Nothing matched", 15);
 using ErrorRegex = MP_STR("Regex not matched", 17);
 using ErrorKeyword = MP_STR("Bad keyword", 11);
 
+// specialization
+
+template <size_t I>
+class NodeSpace: public NodeListIndexed<I> {
+public:
+    using NodeListIndexed<I>::NodeListIndexed;
+
+    virtual bool empty() const {
+        return true;
+    }
+};
+
+template <size_t I>
+class NodeTyped<BuiltinSpace, NodeListIndexed<I>>:
+    public NodeTypedProto<BuiltinSpace, NodeSpace<I>> {
+public:
+    using NodeTypedProto<BuiltinSpace, NodeSpace<I>>::NodeTypedProto;
+};
+
+// specialization end
+
 template <size_t L, size_t M>
 class Tag {
 public:

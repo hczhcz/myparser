@@ -48,10 +48,11 @@ class NodeList: public Node {
 private:
     std::vector<const Node *> children;
 
-public:
+protected:
     inline NodeList(const Input &input):
         Node(input), children() {}
 
+public:
     virtual ~NodeList() {
         for (const Node *child: children) {
             delete child;
@@ -161,7 +162,7 @@ public:
 };
 
 template <class N, class T, size_t I = 0>
-class NodeTyped: public T {
+class NodeTypedProto: public T {
 public:
     using T::T;
 
@@ -172,6 +173,12 @@ public:
     virtual const std::string &getRuleName() const {
         return N::getStr();
     }
+};
+
+template <class N, class T>
+class NodeTyped: public NodeTypedProto<N, T> {
+public:
+    using NodeTypedProto<N, T>::NodeTypedProto;
 };
 
 template <class NT, size_t I>
