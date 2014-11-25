@@ -117,12 +117,16 @@ private:
 public:
     inline NodeText(
         const Input &input, std::string &&value
-    ): Node(input), text(value) {}
+    ): Node(input), text(std::move(value)) {}
 
     // virtual ~NodeText() {}
 
+    virtual bool accepted() const {
+        return true;
+    }
+
     virtual bool empty() const {
-        return text.size() == 0;
+        return accepted() && text.size() == 0;
     }
 
     virtual size_t getLen() const {
@@ -143,15 +147,8 @@ class NodeTextOrError: public NodeText<> {
 public:
     inline NodeTextOrError(
         const Input &input, std::string &&value
-    ): NodeText(input, value) {}
+    ): NodeText(input, std::move(value)) {}
 
-    virtual bool accepted() const {
-        return true;
-    }
-
-    virtual bool empty() const {
-        return accepted() && text.size() == 0;
-    }
 };
 
 template <class E>
@@ -190,6 +187,7 @@ public:
     }
 };
 
+// could specialization
 template <class N, class T>
 class NodeTyped: public NodeTypedProto<N, T> {
 public:
@@ -200,7 +198,7 @@ template <class NT, size_t I>
 using NodeListTyped = NodeTyped<NT, NodeListIndexed<I>>;
 
 template <class NT>
-using NodeTextTyped = NodeTyped<NT, NodeTextOrError<>>;
+using NodeTextTyped = NodeTyped<NT, NodeText<>>;
 
 template <class NT, class E>
 using NodeErrorTyped = NodeTyped<NT, NodeError<E>>;

@@ -4,13 +4,9 @@
 // option list
 
 #if !defined(MYPARSER_CUSTOMIZED)
-    // global
-
     #define MYPARSER_DEBUG
-
-    // parser
-
     #define MYPARSER_AST_CCC
+
     #if defined(__GNUC__) || defined(__clang__)
         #define MYPARSER_FORCE_INLINE
     #endif

@@ -103,6 +103,19 @@ public:
         putMainEnd();
     }
 
+    void run(const NodeText<> *node) {
+        putMainBegin();
+
+        putName(node->getRuleName());
+
+        putBegin();
+        putText(node->getText());
+        putEnd();
+
+        putMainEnd();
+    }
+
+    template <class E>
     void run(const NodeTextOrError<E> *node) {
         putMainBegin();
 
