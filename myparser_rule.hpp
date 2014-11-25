@@ -78,7 +78,11 @@ private:
 
             if (!next.second) {
                 return {next.first, current.second};
-            } else if (current.second->getPos() >= next.second->getPos()) {
+            } else if (
+                current.second->getPos() + current.second->getLen()
+                >=
+                next.second->getPos() + next.second->getLen()
+            ) {
                 delete next.second;
                 return {next.first, current.second};
             } else {
@@ -95,7 +99,7 @@ private:
         (void) end;
 
         return {
-            nullptr, new NodeErrorNativeTyped<N, ErrorList>(input)
+            nullptr, new NodeErrorTyped<N, ErrorList>(input)
         };
     }
 
@@ -136,7 +140,7 @@ private:
                 regex_lib::regex_constants::match_continuous
             )
         ) {
-            auto str = mdata.str();
+            std::string str = mdata.str();
             input += str.size();
 
             return {
@@ -144,7 +148,7 @@ private:
             };
         } else {
             return {
-                nullptr, new NodeErrorNativeTyped<N, ErrorRegex>(input)
+                nullptr, new NodeErrorTyped<N, ErrorRegex>(input)
             };
         }
     }
@@ -186,18 +190,14 @@ public:
             if (current.first) {
                 delete current.first;
             }
-
             if (current.second) {
-                return {
-                    nullptr,
-                    new NodeErrorWrapTyped<BuiltinError, ErrorKeyword>(input, current.second)
-                };
-            } else {
-                return {
-                    nullptr,
-                    new NodeErrorNativeTyped<BuiltinError, ErrorKeyword>(input)
-                };
+                delete current.second;
             }
+
+            return {
+                nullptr,
+                new NodeErrorTyped<BuiltinError, ErrorKeyword>(input)
+            };
         }
     }
 };
@@ -222,7 +222,7 @@ public:
 
         return {
             nullptr,
-            new NodeErrorNativeTyped<BuiltinError, E>(input)
+            new NodeErrorTyped<BuiltinError, E>(input)
         };
     }
 };

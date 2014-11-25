@@ -112,7 +112,7 @@ public:
     }
 
     template <class E>
-    void run(const NodeErrorNative<E> *node) {
+    void run(const NodeError<E> *node) {
         putMainBegin();
 
         putName(node->getRuleName());
@@ -120,26 +120,6 @@ public:
         putBegin();
         putError(E::getStr());
         putEnd();
-
-        putMainEnd();
-    }
-
-    template <class E>
-    void run(const NodeErrorWrap<E> *node) {
-        putMainBegin();
-
-        putName(node->getRuleName());
-
-        putBegin();
-        putError(E::getStr());
-        putEnd();
-
-        putLnBegin();
-        ++indent;
-        putLn(true);
-        node->getChild()->runPass(this);
-        --indent;
-        putLnEnd();
 
         putMainEnd();
     }
