@@ -103,13 +103,17 @@ public:
         putMainEnd();
     }
 
-    void run(const NodeText<> *node) {
+    void run(const NodeTextOrError<E> *node) {
         putMainBegin();
 
         putName(node->getRuleName());
 
         putBegin();
-        putText(node->getText());
+        if (node->accepted()) {
+            putText(node->getText());
+        } else {
+            putError(E::getStr());
+        }
         putEnd();
 
         putMainEnd();
@@ -137,8 +141,9 @@ protected:
     }
 
 public:
-    inline PassReprText(std::ostream &target):
-        Pass<PASS_REPR>(target, true, false) {}
+    inline PassReprText(
+        std::ostream &target
+    ): Pass<PASS_REPR>(target, true, false) {}
 
     // virtual ~PassReprText() {}
 };
@@ -171,8 +176,7 @@ public:
     inline PassReprSimple(
         std::ostream &target,
         const bool verbose = false, const bool compact = true
-    ):
-        Pass<PASS_REPR>(target, verbose, compact) {}
+    ): Pass<PASS_REPR>(target, verbose, compact) {}
 
     // virtual ~PassReprSimple() {}
 };
@@ -215,8 +219,7 @@ public:
     inline PassReprFull(
         std::ostream &target,
         const bool verbose = false, const bool compact = true
-    ):
-        Pass<PASS_REPR>(target, verbose, compact) {}
+    ): Pass<PASS_REPR>(target, verbose, compact) {}
 
     // virtual ~PassReprFull() {}
 };
@@ -335,8 +338,7 @@ protected:
 public:
     inline PassReprJSON(
         std::ostream &target, const bool verbose = false
-    ):
-        Pass<PASS_REPR>(target, verbose, false) {}
+    ): Pass<PASS_REPR>(target, verbose, false) {}
 
     // virtual ~PassReprJSON() {}
 };

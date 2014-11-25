@@ -115,14 +115,11 @@ private:
     const std::string text;
 
 public:
-    inline NodeText(const Input &input, const std::string &value):
-        Node(input), text(value) {}
+    inline NodeText(
+        const Input &input, std::string &&value
+    ): Node(input), text(value) {}
 
     // virtual ~NodeText() {}
-
-    virtual bool accepted() const {
-        return true;
-    }
 
     virtual bool empty() const {
         return text.size() == 0;
@@ -142,14 +139,28 @@ public:
 };
 
 template <class E>
+class NodeTextOrError: public NodeText<> {
+public:
+    inline NodeTextOrError(
+        const Input &input, std::string &&value
+    ): NodeText(input, value) {}
+
+    virtual bool accepted() const {
+        return true;
+    }
+
+    virtual bool empty() const {
+        return accepted() && text.size() == 0;
+    }
+};
+
+template <class E>
 class NodeError: public Node {
 public:
     inline NodeError(const Input &input):
         Node(input) {}
 
     // virtual ~NodeError() {}
-
-    using ErrorType = E;
 
     virtual bool empty() const {
         return false;
@@ -189,7 +200,7 @@ template <class NT, size_t I>
 using NodeListTyped = NodeTyped<NT, NodeListIndexed<I>>;
 
 template <class NT>
-using NodeTextTyped = NodeTyped<NT, NodeText<>>;
+using NodeTextTyped = NodeTyped<NT, NodeTextOrError<>>;
 
 template <class NT, class E>
 using NodeErrorTyped = NodeTyped<NT, NodeError<E>>;

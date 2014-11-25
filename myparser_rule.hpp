@@ -149,7 +149,8 @@ private:
             std::string str = mdata.str();
             input += str.size();
 
-            NodeTextTyped<N> *result = new NodeTextTyped<N>(input, str);
+            NodeTextTyped<N> *result =
+                new NodeTextTyped<N>(input, std::move(str));
 
             if (result->accepted()) {
                 return {result, nullptr};
@@ -328,6 +329,12 @@ public:
     }
 
     static inline Node *parse(const std::string input) {
+        Input iter = input.cbegin();
+
+        return parse(iter, input.cend());
+    }
+
+    static inline Node *parse(std::string &&input) {
         Input iter = input.cbegin();
 
         return parse(iter, input.cend());
