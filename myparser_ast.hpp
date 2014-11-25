@@ -120,6 +120,10 @@ public:
 
     // virtual ~NodeText() {}
 
+    virtual bool accepted() const {
+        return true;
+    }
+
     virtual bool empty() const {
         return text.size() == 0;
     }

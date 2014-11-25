@@ -50,8 +50,12 @@ protected:
     }
 
 public:
-    inline Pass(std::ostream &target, const bool verbose, const bool compact):
-        PassProto<PASS_REPR>(), optionV(verbose), optionC(compact),
+    inline Pass(
+        std::ostream &target,
+        const bool verbose, const bool compact
+    ):
+        PassProto<PASS_REPR>(),
+        optionV(verbose), optionC(compact),
         out(target), indent(0) {}
 
     // virtual ~Pass() {}

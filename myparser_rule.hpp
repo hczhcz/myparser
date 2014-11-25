@@ -3,7 +3,7 @@
 
 #include "myparser_common.hpp"
 #include "myparser_str.hpp"
-#include "myparser_ast.hpp"
+#include "myparser_ast_plus.hpp"
 
 namespace myparser {
 
@@ -14,28 +14,8 @@ using BuiltinError = MP_STR("error", 5);
 
 using ErrorList = MP_STR("Nothing matched", 15);
 using ErrorRegex = MP_STR("Regex not matched", 17);
+using ErrorChecking = MP_STR("Match not accepted", 18);
 using ErrorKeyword = MP_STR("Bad keyword", 11);
-
-// specialization
-
-template <size_t I>
-class NodeSpace: public NodeListIndexed<I> {
-public:
-    using NodeListIndexed<I>::NodeListIndexed;
-
-    virtual bool empty() const {
-        return true;
-    }
-};
-
-template <size_t I>
-class NodeTyped<BuiltinSpace, NodeListIndexed<I>>:
-    public NodeTypedProto<BuiltinSpace, NodeSpace<I>> {
-public:
-    using NodeTypedProto<BuiltinSpace, NodeSpace<I>>::NodeTypedProto;
-};
-
-// specialization end
 
 template <size_t L, size_t M>
 class Tag {
@@ -67,7 +47,9 @@ protected:
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
-    static std::pair<Node *, Node *> parse(Input &input, const Input &end);
+    static std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
+    );
 };
 
 template <>
@@ -113,14 +95,15 @@ private:
         }
     }
 
-    template <size_t I, std::nullptr_t P = nullptr> // iteration finished
+    template <size_t I> // iteration finished
     static MYPARSER_INLINE std::pair<Node *, Node *> runRule(
         Input &input, const Input &end
     ) {
         (void) end;
 
         return {
-            nullptr, new NodeErrorTyped<N, ErrorList>(input)
+            nullptr,
+            new NodeErrorTyped<N, ErrorList>(input)
         };
     }
 
@@ -130,7 +113,9 @@ protected:
     // virtual ~RuleList() {}
 
 public:
-    static std::pair<Node *, Node *> parse(Input &input, const Input &end) {
+    static std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
+    ) {
         return runRule<0, RL...>(input, end);
     }
 };
@@ -164,12 +149,20 @@ private:
             std::string str = mdata.str();
             input += str.size();
 
-            return {
-                new NodeTextTyped<N>(input, str), nullptr
-            };
+            NodeTextTyped<N> *result = new NodeTextTyped<N>(input, str);
+
+            if (result->accepted()) {
+                return {result, nullptr};
+            } else {
+                return {
+                    nullptr,
+                    new NodeErrorTyped<N, ErrorChecking>(input)
+                };
+            }
         } else {
             return {
-                nullptr, new NodeErrorTyped<N, ErrorRegex>(input)
+                nullptr,
+                new NodeErrorTyped<N, ErrorRegex>(input)
             };
         }
     }
@@ -180,7 +173,9 @@ protected:
     // virtual ~RuleRegex() {}
 
 public:
-    static std::pair<Node *, Node *> parse(Input &input, const Input &end) {
+    static std::pair<Node *, Node *> parse(
+        Input &input, const Input &end
+    ) {
         return runRegex(input, end);
     }
 };
@@ -205,7 +200,11 @@ public:
     ) {
         auto current = RuleDef<N>::parse(input, end);
 
-        if (current.first && current.first->getFullText() == KW::getStr()) {
+        if (
+            current.first
+            &&
+            current.first->getFullText() == KW::getStr()
+        ) {
             return current;
         } else {
             if (current.first) {
