@@ -1,7 +1,6 @@
 #ifndef MYPARSER_AST_HPP
 #define MYPARSER_AST_HPP
 
-#include "myparser_common.hpp"
 #include "myparser_pass.hpp"
 
 namespace myparser {

@@ -1,7 +1,6 @@
 #ifndef MYPARSER_RULE_HPP
 #define MYPARSER_RULE_HPP
 
-#include "myparser_common.hpp"
 #include "myparser_str.hpp"
 #include "myparser_ast_plus.hpp"
 

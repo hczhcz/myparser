@@ -51,9 +51,7 @@ def cplusplus_gen(content, mppath, guard):
 #ifndef ''' + guard + '''
 #define ''' + guard + '''
 
-#include "''' + mppath + '''myparser_rule.hpp"
-#include "''' + mppath + '''myparser_pass_filter.hpp"
-#include "''' + mppath + '''myparser_pass_repr.hpp"
+#include "''' + mppath + '''myparser.hpp"
 
 namespace myparser {
 
