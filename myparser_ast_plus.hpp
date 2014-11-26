@@ -31,14 +31,14 @@ public:
         if (conv >> *data && conv.eof()) {
             // success
         } else {
-            delete data;
+            MYPARSER_DELETE data;
             data = nullptr;
         }
     }
 
     virtual ~NodeData() {
         if (data) {
-            delete data;
+            MYPARSER_DELETE data;
         }
     }
 

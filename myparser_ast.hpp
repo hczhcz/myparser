@@ -51,10 +51,10 @@ public:
         }
 
         if (getTail() > target->getTail()) {
-            delete target;
+            MYPARSER_DELETE target;
             return this;
         } else {
-            delete this;
+            MYPARSER_DELETE this;
             return target;
         }
     }
@@ -72,7 +72,7 @@ protected:
 public:
     virtual ~NodeList() {
         for (const Node *child: children) {
-            delete child;
+            MYPARSER_DELETE child;
         }
     }
 

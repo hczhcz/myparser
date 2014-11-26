@@ -203,7 +203,7 @@ public:
             return current;
         } else {
             if (current.first) {
-                delete current.first;
+                MYPARSER_DELETE current.first;
             }
 
             return {
@@ -256,6 +256,15 @@ public:
             for (size_t i = 0; i < R::most; ++i) {
                 auto current = R::parse(input, end);
 
+                if (current.second) {
+                    err = current.second->challengeLonger(err);
+
+                    // if err updated
+                    if (err == current.second) {
+                        errpos = result->getChildren().size();
+                    }
+                }
+
                 if (!current.first) {
                     if (i < R::least) {
                         return false;
@@ -264,15 +273,6 @@ public:
                     }
                 } else {
                     result->putChild(current.first);
-                }
-
-                if (current.second) {
-                    err = current.second->challengeLonger(err);
-
-                    // if err updated
-                    if (err == current.second) {
-                        errpos = result->getChildren().size();
-                    }
                 }
             }
 
@@ -302,19 +302,21 @@ public:
             Node *err = nullptr;
             size_t errpos = 0;
 
-            if (!runRule<RL...>(result, err, errpos, input, end)) {
-                delete result;
-                result = nullptr;
-            }
+            bool succeed = runRule<RL...>(result, err, errpos, input, end);
 
             if (err) {
                 for (size_t i = 0; i < errpos; ++i) {
-                    //result_err->putChild(result->getChildren()[i]);
+                    result_err->putChild(result->getChildren()[i]);
                 }
                 result_err->putChild(err);
             } else {
-                delete result_err;
+                MYPARSER_DELETE result_err;
                 result_err = nullptr;
+            }
+
+            if (!succeed) {
+                MYPARSER_DELETE result;
+                result = nullptr;
             }
 
             return {result, result_err};
@@ -330,7 +332,7 @@ public:
 
         if (current.first) {
             if (current.second) {
-                delete current.second;
+                MYPARSER_DELETE current.second;
             }
 
             return current.first;

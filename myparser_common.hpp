@@ -50,6 +50,8 @@
     #define MYPARSER_INLINE inline
 #endif
 
+#define MYPARSER_DELETE (void *)
+
 namespace myparser {
 
 #if defined(MYPARSER_DEBUG)
