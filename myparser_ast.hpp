@@ -40,6 +40,24 @@ public:
     inline const Input &getPos() const {
         return pos;
     }
+
+    inline const Input getTail() const {
+        return pos + getLen();
+    }
+
+    inline Node *challengeLonger(Node *target) {
+        if (!target) {
+            return this;
+        }
+
+        if (getTail() > target->getTail()) {
+            delete target;
+            return this;
+        } else {
+            delete this;
+            return target;
+        }
+    }
 };
 
 template <class TX = void> // actually not a template

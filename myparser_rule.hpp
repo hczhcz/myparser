@@ -80,16 +80,11 @@ private:
 
             if (!next.second) {
                 return {next.first, current.second};
-            } else if (
-                current.second->getPos() + current.second->getLen()
-                >=
-                next.second->getPos() + next.second->getLen()
-            ) {
-                delete next.second;
-                return {next.first, current.second};
             } else {
-                delete current.second;
-                return next;
+                return {
+                    next.first,
+                    next.second->challengeLonger(current.second)
+                };
             }
         }
     }
@@ -210,13 +205,11 @@ public:
             if (current.first) {
                 delete current.first;
             }
-            if (current.second) {
-                delete current.second;
-            }
 
             return {
                 nullptr,
-                new NodeErrorTyped<BuiltinError, ErrorKeyword>(input)
+                (new NodeErrorTyped<BuiltinError, ErrorKeyword>(input))
+                    ->challengeLonger(current.second)
             };
         }
     }
@@ -257,7 +250,7 @@ public:
     private:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
-            NodeListTyped<N, I> *&result,
+            NodeListTyped<N, I> *&result, Node *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
@@ -265,30 +258,35 @@ public:
 
                 if (!current.first) {
                     if (i < R::least) {
-                        result->putChild(current.second);
                         return false;
                     } else {
-                        delete current.second;
                         break;
                     }
                 } else {
-                    if (current.second) {
-                        delete current.second;
-                    }
-
                     result->putChild(current.first);
+                }
+
+                if (current.second) {
+                    err = current.second->challengeLonger(err);
+
+                    // if err updated
+                    if (err == current.second) {
+                        errpos = result->getChildren().size();
+                    }
                 }
             }
 
-            return runRule<Rx...>(result, input, end);
+            return runRule<Rx...>(result, err, errpos, input, end);
         }
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            NodeListTyped<N, I> *&result,
+            NodeListTyped<N, I> *&result, Node *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             (void) result;
+            (void) err;
+            (void) errpos;
             (void) input;
             (void) end;
 
@@ -300,12 +298,26 @@ public:
             Input &input, const Input &end
         ) {
             NodeListTyped<N, I> *result = new NodeListTyped<N, I>(input);
+            NodeListTyped<N, I> *result_err = new NodeListTyped<N, I>(input);
+            Node *err = nullptr;
+            size_t errpos = 0;
 
-            if (runRule<RL...>(result, input, end)) {
-                return {result, nullptr};
-            } else {
-                return {nullptr, result};
+            if (!runRule<RL...>(result, err, errpos, input, end)) {
+                delete result;
+                result = nullptr;
             }
+
+            if (err) {
+                for (size_t i = 0; i < errpos; ++i) {
+                    //result_err->putChild(result->getChildren()[i]);
+                }
+                result_err->putChild(err);
+            } else {
+                delete result_err;
+                result_err = nullptr;
+            }
+
+            return {result, result_err};
         }
     };
 };
