@@ -149,6 +149,8 @@ private:
             if (result->accepted()) {
                 return {result, nullptr};
             } else {
+                delete result;
+
                 return {
                     nullptr,
                     new NodeErrorTyped<N, ErrorChecking>(input)
@@ -203,7 +205,7 @@ public:
             return current;
         } else {
             if (current.first) {
-                MYPARSER_DELETE current.first;
+                current.first->free();
             }
 
             return {
@@ -304,18 +306,21 @@ public:
 
             bool succeed = runRule<RL...>(result, err, errpos, input, end);
 
+            result->bind(result_err, errpos);
+            result_err->bind(result, errpos);
+
             if (err) {
                 for (size_t i = 0; i < errpos; ++i) {
                     result_err->putChild(result->getChildren()[i]);
                 }
                 result_err->putChild(err);
             } else {
-                MYPARSER_DELETE result_err;
+                result_err->free();
                 result_err = nullptr;
             }
 
             if (!succeed) {
-                MYPARSER_DELETE result;
+                result->free();
                 result = nullptr;
             }
 
@@ -332,7 +337,7 @@ public:
 
         if (current.first) {
             if (current.second) {
-                MYPARSER_DELETE current.second;
+                current.second->free();
             }
 
             return current.first;

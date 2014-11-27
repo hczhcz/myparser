@@ -19,6 +19,10 @@ protected:
 public:
     virtual ~Node() {} // destructable (public)
 
+    virtual inline void free() { // hack // TODO
+        delete this;
+    }
+
     virtual bool empty() const = 0;
 
     virtual void runPass(PassBase *pass) const = 0;
@@ -51,10 +55,10 @@ public:
         }
 
         if (getTail() > target->getTail()) {
-            MYPARSER_DELETE target;
+            target->free();
             return this;
         } else {
-            MYPARSER_DELETE this;
+            this->free();
             return target;
         }
     }
@@ -63,7 +67,10 @@ public:
 template <class TX = void> // actually not a template
 class NodeList: public Node {
 private:
-    std::vector<const Node *> children;
+    std::vector<Node *> children;
+
+    size_t basepos;
+    NodeList<> *brother = nullptr;
 
 protected:
     inline NodeList(const Input &input):
@@ -71,13 +78,21 @@ protected:
 
 public:
     virtual ~NodeList() {
-        for (const Node *child: children) {
-            MYPARSER_DELETE child;
+        for (size_t i = basepos; i < children.size(); ++i) {
+            children[i]->free();
         }
     }
 
+    virtual void free() {
+        if (brother) {
+            brother->basepos = 0;
+            brother->brother = nullptr;
+        }
+        delete this;
+    }
+
     virtual bool empty() const {
-        for (const Node *child: children) {
+        for (Node *child: children) {
             if (!child->empty()) {
                 return false;
             }
@@ -86,14 +101,19 @@ public:
         return true;
     }
 
-    inline void putChild(const Node *value) {
+    inline void bind(NodeList<> *target, const size_t pos) {
+        brother = target;
+        basepos = pos;
+    }
+
+    inline void putChild(Node *value) {
         children.push_back(value);
     }
 
     virtual size_t getLen() const {
         size_t result = 0;
 
-        for (const Node *child: children) {
+        for (Node *child: children) {
             result += child->getLen();
         }
 
@@ -101,14 +121,14 @@ public:
     }
 
     virtual void getFullText(std::ostream &out) const {
-        for (const Node *child: children) {
+        for (Node *child: children) {
             child->getFullText(out);
         }
     }
 
     virtual size_t getIndex() const = 0;
 
-    inline const std::vector<const Node *> &getChildren() const {
+    inline const std::vector<Node *> &getChildren() const {
         return children;
     }
 };

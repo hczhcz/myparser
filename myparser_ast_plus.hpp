@@ -8,7 +8,8 @@ namespace myparser {
 template <size_t I>
 class NodeSpace: public NodeListIndexed<I> {
 public:
-    inline NodeSpace(const Input &input): NodeListIndexed<I>(input) {}
+    inline NodeSpace(const Input &input):
+        NodeListIndexed<I>(input) {}
 
     // virtual ~NodeSpace() {}
 
@@ -31,14 +32,14 @@ public:
         if (conv >> *data && conv.eof()) {
             // success
         } else {
-            MYPARSER_DELETE data;
+            delete data;
             data = nullptr;
         }
     }
 
     virtual ~NodeData() {
         if (data) {
-            MYPARSER_DELETE data;
+            delete data;
         }
     }
 

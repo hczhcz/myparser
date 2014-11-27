@@ -66,17 +66,17 @@ public:
         putName(node->getRuleName());
         putIndex(node->getIndex());
 
-        std::vector<const Node *> children1;
+        std::vector<Node *> children1;
 
         if (!optionV) {
-            for (const Node *child: node->getChildren()) {
+            for (Node *child: node->getChildren()) {
                 if (!child->empty()) {
                     children1.push_back(child);
                 }
             }
         }
 
-        const std::vector<const Node *> &children =
+        const std::vector<Node *> &children =
             optionV ? node->getChildren() : children1;
 
         if (optionC && children.size() == 1) {
