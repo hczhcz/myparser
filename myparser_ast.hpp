@@ -210,8 +210,29 @@ public:
     }
 };
 
+// could specialize
+template <class NT, size_t I>
+class NodeBaseList {
+public:
+    using Type = NodeListIndexed<I>;
+};
+
+// could specialize
+template <class NT>
+class NodeBaseText {
+public:
+    using Type = NodeText<>;
+};
+
+// could specialize
+template <class NT, class E>
+class NodeBaseError {
+public:
+    using Type = NodeError<E>;
+};
+
 template <class N, class T, size_t I = 0 /* bind later */>
-class NodeTypedProto: public T {
+class NodeTyped: public T {
 public:
     using T::T;
 
@@ -224,21 +245,14 @@ public:
     }
 };
 
-// could specialization
-template <class N, class T>
-class NodeTyped: public NodeTypedProto<N, T> {
-public:
-    using NodeTypedProto<N, T>::NodeTypedProto;
-};
-
 template <class NT, size_t I>
-using NodeListTyped = NodeTyped<NT, NodeListIndexed<I>>;
+using NodeTypedList = NodeTyped<NT, typename NodeBaseList<NT, I>::Type>;
 
 template <class NT>
-using NodeTextTyped = NodeTyped<NT, NodeText<>>;
+using NodeTypedText = NodeTyped<NT, typename NodeBaseText<NT>::Type>;
 
 template <class NT, class E>
-using NodeErrorTyped = NodeTyped<NT, NodeError<E>>;
+using NodeTypedError = NodeTyped<NT, typename NodeBaseError<NT, E>::Type>;
 
 }
 

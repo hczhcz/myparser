@@ -77,17 +77,6 @@ public:
     }
 };
 
-/*
-specialization example:
-
-template <size_t I>
-class NodeTyped<BuiltinSpace, NodeListIndexed<I>>:
-public NodeTypedProto<BuiltinSpace, NodeSpace<I>> {
-public:
-    using NodeTypedProto<BuiltinSpace, NodeSpace<I>>::NodeTypedProto;
-};
-*/
-
 }
 
 #endif

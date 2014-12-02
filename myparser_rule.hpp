@@ -42,7 +42,7 @@ protected:
     // virtual ~RuleNamed() {}
 };
 
-// need specialization
+// need specialize
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
@@ -63,7 +63,7 @@ template <class N, class... RL>
 class RuleList: public RuleNamed<N> {
 public:
     template <size_t I>
-    using Result = NodeListTyped<N, I>;
+    using Result = NodeTypedList<N, I>;
     // == Helper::Result<>
 
 private:
@@ -103,7 +103,7 @@ private:
 
         return {
             nullptr,
-            new NodeErrorTyped<N, ErrorList>(input)
+            new NodeTypedError<N, ErrorList>(input)
         };
     }
 
@@ -124,7 +124,7 @@ template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
 public:
     template <class TX = void> // actually not a template
-    using Result = NodeTextTyped<N>;
+    using Result = NodeTypedText<N>;
 
 private:
     static MYPARSER_INLINE std::pair<Node *, Node *> runRegex(
@@ -163,13 +163,13 @@ private:
 
                 return {
                     nullptr,
-                    new NodeErrorTyped<N, ErrorChecking>(input)
+                    new NodeTypedError<N, ErrorChecking>(input)
                 };
             }
         } else {
             return {
                 nullptr,
-                new NodeErrorTyped<N, ErrorRegex>(input)
+                new NodeTypedError<N, ErrorRegex>(input)
             };
         }
     }
@@ -220,7 +220,7 @@ public:
 
             return {
                 nullptr,
-                (new NodeErrorTyped<BuiltinKeyword, ErrorKeyword>(input))
+                (new NodeTypedError<BuiltinKeyword, ErrorKeyword>(input))
                     //              ^ or BuiltinError ?
                     ->challengeLonger(current.second)
             };
@@ -248,7 +248,7 @@ public:
 
         return {
             nullptr,
-            new NodeErrorTyped<BuiltinError, E>(input)
+            new NodeTypedError<BuiltinError, E>(input)
         };
     }
 };
@@ -262,7 +262,7 @@ public:
     class Helper {
     public:
         template <class TX = void> // actually not a template
-        using Result = NodeListTyped<N, I>;
+        using Result = NodeTypedList<N, I>;
 
     private:
         template <class R, class... Rx>
