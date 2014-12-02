@@ -338,7 +338,9 @@ public:
 template <class N = BuiltinRoot>
 class Parser {
 public:
-    static inline Node *parse(Input &input, const Input &end) {
+    static inline Node *parse(
+        Input &input, const Input &end, bool dothrow = true
+    ) {
         auto current = RuleDef<N>::parse(input, end);
 
         if (current.first) {
@@ -348,20 +350,28 @@ public:
 
             return current.first;
         } else {
-            return current.second;
+            if (dothrow) {
+                throw current.second;
+            } else {
+                return current.second;
+            }
         }
     }
 
-    static inline Node *parse(const std::string input) {
+    static inline Node *parse(
+        const std::string input, bool dothrow = true
+    ) {
         Input iter = input.cbegin();
 
-        return parse(iter, input.cend());
+        return parse(iter, input.cend(), dothrow);
     }
 
-    static inline Node *parse(std::string &&input) {
+    static inline Node *parse(
+        std::string &&input, bool dothrow = true
+    ) {
         Input iter = input.cbegin();
 
-        return parse(iter, input.cend());
+        return parse(iter, input.cend(), dothrow);
     }
 };
 
