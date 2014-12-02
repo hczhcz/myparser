@@ -46,6 +46,9 @@ protected:
 template <class N>
 class RuleDef: public RuleNamed<N> {
 public:
+    template <class T>
+    using Result = T;
+
     static std::pair<Node *, Node *> parse(
         Input &input, const Input &end
     );
@@ -58,18 +61,21 @@ class RuleDef<BuiltinError>: public RuleNamed<BuiltinError> {};
 
 template <class N, class... RL>
 class RuleList: public RuleNamed<N> {
+public:
+    template <size_t I>
+    using Result = NodeListTyped<N, I>;
+    // == Helper::Result<>
+
 private:
     template <size_t I, class R, class... Rx>
     static MYPARSER_INLINE std::pair<Node *, Node *> runRule(
         Input &input, const Input &end
     ) {
-        using Member =
-            typename R
-            ::template Helper<N, I>;
+        using Line = typename R::template Helper<N, I>;
 
         Input input_rev = input;
 
-        auto current = Member::parse(input, end);
+        auto current = Line::parse(input, end);
 
         if (current.first) {
             return current;
@@ -117,7 +123,8 @@ public:
 template <class N, class RX>
 class RuleRegex: public RuleNamed<N> {
 public:
-    using ResultType = NodeTextTyped<N>;
+    template <class TX = void> // actually not a template
+    using Result = NodeTextTyped<N>;
 
 private:
     static MYPARSER_INLINE std::pair<Node *, Node *> runRegex(
@@ -146,8 +153,8 @@ private:
             std::string str = mdata.str();
             input += str.size();
 
-            ResultType *result =
-                new ResultType(input, std::move(str));
+            Result<> *result =
+                new Result<>(input, std::move(str));
 
             if (result->accepted()) {
                 return {result, nullptr};
@@ -213,7 +220,8 @@ public:
 
             return {
                 nullptr,
-                (new NodeErrorTyped<BuiltinError, ErrorKeyword>(input))
+                (new NodeErrorTyped<BuiltinKeyword, ErrorKeyword>(input))
+                    //              ^ or BuiltinError ?
                     ->challengeLonger(current.second)
             };
         }
@@ -250,14 +258,16 @@ public:
 template <class... RL>
 class RuleLine {
 public:
-    using ResultType = NodeListTyped<N, I>;
-
     template <class N, size_t I>
     class Helper {
+    public:
+        template <class TX = void> // actually not a template
+        using Result = NodeListTyped<N, I>;
+
     private:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
-            ResultType *&result, Node *&err, size_t &errpos,
+            Result<> *&result, Node *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
@@ -288,7 +298,7 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            ResultType *&result, Node *&err, size_t &errpos,
+            Result<> *&result, Node *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             (void) result;
@@ -304,8 +314,8 @@ public:
         static MYPARSER_INLINE std::pair<Node *, Node *> parse(
             Input &input, const Input &end
         ) {
-            ResultType *result = new ResultType(input);
-            ResultType *result_err = new ResultType(input);
+            Result<> *result = new Result<>(input);
+            Result<> *result_err = new Result<>(input);
 
             Node *err = nullptr;
             size_t errpos = 0;

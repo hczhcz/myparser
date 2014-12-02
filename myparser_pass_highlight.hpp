@@ -5,90 +5,43 @@
 
 namespace myparser {
 
-/*
 template <>
 class Pass<PASS_HIGHLIGHT>: public PassProto<PASS_HIGHLIGHT> {
+protected:
+    std::ostream &out;
+
+    virtual void putLnEnd(const std::string &text) {}
+
+    virtual void putText(const std::string &text) {}
+
 public:
     inline Pass(std::ostream &target):
         PassProto<PASS_HIGHLIGHT>(), out(target) {}
 
     // virtual ~Pass() {}
 
+    // TODO ...
+
     void run(const NodeList<> *node) {
-        putMainBegin();
-
-        putName(node->getRuleName());
-        putIndex(node->getIndex());
-
-        std::vector<const Node *> children1;
-
-        if (!optionV) {
-            for (const Node *child: node->getChildren()) {
-                if (!child->empty()) {
-                    children1.push_back(child);
-                }
-            }
+        for (const Node *child: node->getChildren()) {
+            child->runPass(this);
         }
-
-        const std::vector<const Node *> &children =
-            optionV ? node->getChildren() : children1;
-
-        if (optionC && children.size() == 1) {
-            putBegin();
-            children[0]->runPass(this);
-            putEnd();
-        } else {
-            putPlaceHolder();
-
-            putLnBegin();
-            ++indent;
-
-            bool first = true;
-            for (const Node *child: children) {
-                putLn(first);
-                first = false;
-                child->runPass(this);
-            }
-
-            --indent;
-            putLnEnd();
-        }
-
-        putMainEnd();
     }
 
     void run(const NodeText<> *node) {
-        putMainBegin();
-
-        putName(node->getRuleName());
-
-        putBegin();
         putText(node->getText());
-        putEnd();
-
-        putMainEnd();
     }
 
     template <class E>
     void run(const NodeTextOrError<E> *node) {
-        putMainBegin();
-
-        putName(node->getRuleName());
-
-        putBegin();
         if (node->accepted()) {
             putText(node->getText());
-        } else {
-            putError(E::getStr());
         }
-        putEnd();
-
-        putMainEnd();
     }
 
     template <class E>
     void run(const NodeError<E> *node) {}
-};*/
+};
 
 }
 
