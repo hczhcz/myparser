@@ -21,10 +21,35 @@ public:
 template <class T, class E>
 class NodeData: public NodeTextOrError<E> {
 private:
-    const T *data;
+    const T data;
+    const bool succeed;
 
 public:
     inline NodeData(
+        const Input &input, std::string &&value
+    ): NodeTextOrError<E>(input, std::move(value)) {
+        std::istringstream conv(value);
+        succeed = conv >> data && conv.eof();
+    }
+
+    virtual ~NodeData() {}
+
+    virtual bool accepted() const {
+        return succeed;
+    }
+
+    inline const T &getData() {
+        return data;
+    }
+};
+
+template <class T, class E>
+class NodeDataPtr: public NodeTextOrError<E> {
+private:
+    const T *data;
+
+public:
+    inline NodeDataPtr(
         const Input &input, std::string &&value
     ): NodeTextOrError<E>(input, std::move(value)) {
         std::istringstream conv(value);
@@ -37,7 +62,7 @@ public:
         }
     }
 
-    virtual ~NodeData() {
+    virtual ~NodeDataPtr() {
         if (data) {
             delete data;
         }
