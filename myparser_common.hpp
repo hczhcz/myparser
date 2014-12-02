@@ -80,8 +80,9 @@ namespace myparser {
 enum {
     PASS_FILTER, // TODO
     PASS_REPR,
-    PASS_HIGHLIGHT,
+    PASS_HIGHLIGHT, // TODO
     PASS_MESSAGE, // TODO // input [(list, message), ...] output [lineno:pos message]
+    PASS_USER,
 
     PASS_FIN = 64
 };

@@ -1,7 +1,7 @@
 #ifndef MYPARSER_PASS_HIGHLIGHT_HPP
 #define MYPARSER_PASS_HIGHLIGHT_HPP
 
-#include "myparser_pass.hpp"
+#include "myparser_ast_plus.hpp"
 
 namespace myparser {
 

@@ -210,7 +210,7 @@ public:
     }
 };
 
-template <class N, class T, size_t I = 0>
+template <class N, class T, size_t I = 0 /* bind later */>
 class NodeTypedProto: public T {
 public:
     using T::T;

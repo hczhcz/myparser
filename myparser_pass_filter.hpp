@@ -1,7 +1,7 @@
 #ifndef MYPARSER_PASS_FILTER_HPP
 #define MYPARSER_PASS_FILTER_HPP
 
-#include "myparser_pass.hpp"
+#include "myparser_ast_plus.hpp"
 
 namespace myparser {
 
