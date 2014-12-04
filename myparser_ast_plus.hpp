@@ -21,14 +21,14 @@ public:
 template <class T, class E>
 class NodeData: public NodeTextOrError<E> {
 private:
-    const T data;
-    const bool succeed;
+    T data;
+    bool succeed;
 
 public:
     inline NodeData(
         const Input &input, std::string &&value
     ): NodeTextOrError<E>(input, std::move(value)) {
-        std::istringstream conv(value);
+        std::istringstream conv(NodeTextOrError<E>::getText());
         succeed = conv >> data && conv.eof();
     }
 
@@ -38,7 +38,7 @@ public:
         return succeed;
     }
 
-    inline const T &getData() {
+    inline const T &getData() const {
         return data;
     }
 };
@@ -46,13 +46,13 @@ public:
 template <class T, class E>
 class NodeDataPtr: public NodeTextOrError<E> {
 private:
-    const T *data;
+    T *data;
 
 public:
     inline NodeDataPtr(
         const Input &input, std::string &&value
     ): NodeTextOrError<E>(input, std::move(value)) {
-        std::istringstream conv(value);
+        std::istringstream conv(NodeTextOrError<E>::getText());
         data = new T;
         if (conv >> *data && conv.eof()) {
             // success
@@ -72,7 +72,7 @@ public:
         return data;
     }
 
-    inline const T &getData() {
+    inline const T &getData() const {
         return *data;
     }
 };
