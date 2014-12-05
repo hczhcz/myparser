@@ -126,8 +126,6 @@ public:
         }
     }
 
-    virtual size_t getIndex() const = 0;
-
     inline const std::vector<Node *> &getChildren() const {
         return children;
     }
@@ -141,7 +139,7 @@ public:
 
     // virtual ~NodeListIndexed() {}
 
-    virtual size_t getIndex() const {
+    inline size_t getIndex() const {
         return I;
     }
 };
@@ -151,11 +149,12 @@ class NodeText: public Node {
 private:
     const std::string text;
 
-public:
+protected:
     inline NodeText(
         const Input &input, std::string &&value
     ): Node(input), text(std::move(value)) {}
 
+public:
     // virtual ~NodeText() {}
 
     virtual bool accepted() const {
@@ -177,6 +176,14 @@ public:
     inline const std::string &getText() const {
         return text;
     }
+};
+
+template <class TX = void> // actually not a template
+class NodeTextPure: public NodeText<> {
+public:
+    inline NodeTextPure(
+        const Input &input, std::string &&value
+    ): NodeText(input, std::move(value)) {}
 };
 
 template <class E>
@@ -221,7 +228,7 @@ public:
 template <class NT>
 class NodeBaseText {
 public:
-    using Type = NodeText<>;
+    using Type = NodeTextPure<>;
 };
 
 // could specialize

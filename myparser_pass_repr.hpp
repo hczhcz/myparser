@@ -60,11 +60,12 @@ public:
 
     // virtual ~Pass() {}
 
-    void run(const NodeList<> *node) {
+    template <size_t I>
+    void run(const NodeListIndexed<I> *node) {
         putMainBegin();
 
         putName(node->getRuleName());
-        putIndex(node->getIndex());
+        putIndex(node->getIndex()); // getIndex() == I
 
         std::vector<Node *> children1;
 
@@ -103,7 +104,8 @@ public:
         putMainEnd();
     }
 
-    void run(const NodeText<> *node) {
+    template <class TX = void> // actually not a template
+    void run(const NodeTextPure<> *node) {
         putMainBegin();
 
         putName(node->getRuleName());

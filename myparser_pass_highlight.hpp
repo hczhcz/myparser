@@ -22,13 +22,15 @@ public:
 
     // TODO ...
 
-    void run(const NodeList<> *node) {
+    template <size_t I>
+    void run(const NodeListIndexed<I> *node) {
         for (const Node *child: node->getChildren()) {
             child->runPass(this);
         }
     }
 
-    void run(const NodeText<> *node) {
+    template <class TX = void> // actually not a template
+    void run(const NodeTextPure<> *node) {
         putText(node->getText());
     }
 
