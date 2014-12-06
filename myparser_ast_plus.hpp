@@ -43,40 +43,6 @@ public:
     }
 };
 
-template <class T, class E>
-class NodeDataPtr: public NodeTextOrError<E> {
-private:
-    T *data;
-
-public:
-    inline NodeDataPtr(
-        const Input &input, std::string &&value
-    ): NodeTextOrError<E>(input, std::move(value)) {
-        std::istringstream conv(NodeTextOrError<E>::getText());
-        data = new T;
-        if (conv >> *data && conv.eof()) {
-            // success
-        } else {
-            delete data;
-            data = nullptr;
-        }
-    }
-
-    virtual ~NodeDataPtr() {
-        if (data) {
-            delete data;
-        }
-    }
-
-    virtual bool accepted() const {
-        return data;
-    }
-
-    inline const T &getData() const {
-        return *data;
-    }
-};
-
 }
 
 #endif
