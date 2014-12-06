@@ -1,11 +1,17 @@
 #ifndef MYPARSER_AST_HPP
 #define MYPARSER_AST_HPP
 
+#include "myparser_str.hpp"
 #include "myparser_pass.hpp"
 
 namespace myparser {
 
 using Input = std::string::const_iterator;
+
+using BuiltinRoot = MP_STR("root", 4);
+using BuiltinSpace = MP_STR("space", 5);
+using BuiltinKeyword = MP_STR("keyword", 7);
+using BuiltinError = MP_STR("error", 5);
 
 class Node {
 private:
@@ -192,7 +198,6 @@ public:
     inline NodeTextOrError(
         const Input &input, std::string &&value
     ): NodeText(input, std::move(value)) {}
-
 };
 
 template <class E>

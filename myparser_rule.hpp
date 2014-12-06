@@ -1,15 +1,11 @@
 #ifndef MYPARSER_RULE_HPP
 #define MYPARSER_RULE_HPP
 
-#include "myparser_str.hpp"
 #include "myparser_ast_plus.hpp"
 
 namespace myparser {
 
-using BuiltinRoot = MP_STR("root", 4);
-using BuiltinSpace = MP_STR("space", 5);
-using BuiltinKeyword = MP_STR("keyword", 7);
-using BuiltinError = MP_STR("error", 5);
+// builtin names -> myparser_ast.hpp
 
 using ErrorList = MP_STR("Nothing matched", 15);
 using ErrorRegex = MP_STR("Regex not matched", 17);
