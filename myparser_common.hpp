@@ -65,27 +65,19 @@ namespace myparser {
 #if defined(MYPARSER_AST_CCC)
     const auto style_normal = ccc::d_all;
 
-    const auto style_index = ccc::cf_magenta + ccc::s_bold;
-    const auto style_word = ccc::cf_yellow + ccc::s_bold + ccc::s_underline_single;
     const auto style_error = ccc::cf_red + ccc::s_bold;
-    const auto style_faint = ccc::s_faint;
-
-    const auto style_keyword = ccc::cf_blue + ccc::s_bold;
     const auto style_space = ccc::s_faint;
     const auto style_number = ccc::cf_magenta + ccc::s_bold;
     const auto style_data = ccc::cf_yellow + ccc::s_bold;
+    const auto style_keyword = ccc::cf_blue + ccc::s_bold;
 #else
     const auto style_normal = "";
 
-    const auto style_index = "";
-    const auto style_word = "";
     const auto style_error = "";
-    const auto style_faint = "";
-
-    const auto style_keyword = "";
     const auto style_space = "";
     const auto style_number = "";
     const auto style_data = "";
+    const auto style_keyword = "";
 #endif
 
 enum {

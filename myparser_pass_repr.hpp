@@ -65,7 +65,7 @@ public:
         putMainBegin();
 
         putName(node->getRuleName());
-        putIndex(node->getIndex()); // getIndex() == I
+        putIndex(I); // getIndex() == I
 
         std::vector<Node *> children1;
 
@@ -167,7 +167,7 @@ template <class TX = void> // actually not a template
 class PassReprSimple: public Pass<PASS_REPR> {
 protected:
     virtual void putText(const std::string &text) {
-        out << style_word << text << style_normal;
+        out << style_data << text << style_normal;
     }
 
     virtual void putError(const std::string &error) {
@@ -205,12 +205,12 @@ protected:
 
     virtual void putIndex(const size_t index) {
         out << '[';
-        out << style_index << index << style_normal;
+        out << style_number << index << style_normal;
         out << ']';
     }
 
     virtual void putText(const std::string &text) {
-        out << style_word << text << style_normal;
+        out << style_data << text << style_normal;
     }
 
     virtual void putError(const std::string &error) {
@@ -218,7 +218,7 @@ protected:
     }
 
     virtual void putBegin() {
-        out << style_faint << " - " << style_normal;
+        out << style_space << " - " << style_normal;
     }
 
     virtual void putLn(const bool first) {
