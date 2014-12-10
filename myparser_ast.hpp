@@ -160,6 +160,10 @@ protected:
         const Input &input, std::string &&value
     ): Node(input), text(std::move(value)) {}
 
+    inline NodeText(
+        const Input &input, const std::string &value
+    ): Node(input), text(value) {}
+
 public:
     // virtual ~NodeText() {}
 
@@ -190,6 +194,14 @@ public:
     inline NodeTextPure(
         const Input &input, std::string &&value
     ): NodeText(input, std::move(value)) {}
+};
+
+template <class KW>
+class NodeTextKeyword: public NodeText<> {
+public:
+    inline NodeTextKeyword(
+        const Input &input
+    ): NodeText(input, KW::getStr()) {}
 };
 
 template <class E>
@@ -237,6 +249,13 @@ public:
 };
 
 // could specialize
+template <class NT, class KW> // NT is always BuiltinKeyword
+class NodeBaseKeyword {
+public:
+    using Type = NodeTextKeyword<KW>;
+};
+
+// could specialize
 template <class NT, class E>
 class NodeBaseError {
 public:
@@ -262,6 +281,9 @@ using NodeTypedList = NodeTyped<NT, typename NodeBaseList<NT, I>::Type>;
 
 template <class NT>
 using NodeTypedText = NodeTyped<NT, typename NodeBaseText<NT>::Type>;
+
+template <class NT, class KW> // NT is always BuiltinKeyword
+using NodeTypedKeyword = NodeTyped<NT, typename NodeBaseKeyword<NT, KW>::Type>;
 
 template <class NT, class E>
 using NodeTypedError = NodeTyped<NT, typename NodeBaseError<NT, E>::Type>;

@@ -52,11 +52,6 @@ public:
         }
     }
 
-    template <class T>
-    void run(const NodeTyped<BuiltinKeyword, T> *node) {
-        putKeyword(node->Node::getFullText());
-    }
-
     // common nodes
 
     template <size_t I>
@@ -69,6 +64,12 @@ public:
     template <class TX = void> // actually not a template
     void run(const NodeTextPure<> *node) {
         putText(node->getText());
+    }
+
+    template <class KW>
+    void run(const NodeTextKeyword<KW> *node) {
+        (void) node;
+        putKeyword(KW::getStr()); // getText() == KW::getStr()
     }
 
     template <class E>

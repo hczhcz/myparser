@@ -27,6 +27,10 @@ protected:
         (void) text;
     }
 
+    virtual void putKeyword(const std::string &text) {
+        (void) text;
+    }
+
     virtual void putError(const std::string &error) {
         (void) error;
     }
@@ -117,6 +121,19 @@ public:
         putMainEnd();
     }
 
+    template <class KW>
+    void run(const NodeTextKeyword<KW> *node) {
+        putMainBegin();
+
+        putName(node->getRuleName());
+
+        putBegin();
+        putKeyword(KW::getStr());
+        putEnd();
+
+        putMainEnd();
+    }
+
     template <class E>
     void run(const NodeTextOrError<E> *node) {
         putMainBegin();
@@ -155,6 +172,10 @@ protected:
         out << text;
     }
 
+    virtual void putKeyword(const std::string &text) {
+        out << text;
+    }
+
 public:
     inline PassReprText(
         std::ostream &target
@@ -168,6 +189,10 @@ class PassReprSimple: public Pass<PASS_REPR> {
 protected:
     virtual void putText(const std::string &text) {
         out << style_data << text << style_normal;
+    }
+
+    virtual void putKeyword(const std::string &text) {
+        out << style_keyword << text << style_normal;
     }
 
     virtual void putError(const std::string &error) {
@@ -211,6 +236,10 @@ protected:
 
     virtual void putText(const std::string &text) {
         out << style_data << text << style_normal;
+    }
+
+    virtual void putKeyword(const std::string &text) {
+        out << style_keyword << text << style_normal;
     }
 
     virtual void putError(const std::string &error) {
@@ -303,6 +332,13 @@ protected:
     virtual void putText(const std::string &text) {
         putLn1();
         out << "\"text\": \"";
+        putStrEscaped(text);
+        out << "\",";
+    }
+
+    virtual void putKeyword(const std::string &text) {
+        putLn1();
+        out << "\"text\": \""; // or "keyword: "?
         putStrEscaped(text);
         out << "\",";
     }

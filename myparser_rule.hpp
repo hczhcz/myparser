@@ -208,17 +208,26 @@ public:
             &&
             current.first->getFullText() == KW::getStr()
         ) {
-            return current;
+            current.first->free();
+            if (current.second) {
+                current.second->free();
+            }
+
+            return {
+                new NodeTypedKeyword<BuiltinKeyword, KW>(input),
+                nullptr
+            };
         } else {
             if (current.first) {
                 current.first->free();
             }
+            if (current.second) {
+                current.second->free();
+            }
 
             return {
                 nullptr,
-                (new NodeTypedError<BuiltinKeyword, ErrorKeyword>(input))
-                    //              ^ or BuiltinError ?
-                    ->challengeLonger(current.second)
+                new NodeTypedError<BuiltinKeyword, ErrorKeyword>(input)
             };
         }
     }
