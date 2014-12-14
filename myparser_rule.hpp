@@ -23,20 +23,16 @@ using TagMaybe = Tag<0, 1>;
 using TagAny0 = Tag<0, std::numeric_limits<size_t>::max()>;
 using TagAny1 = Tag<1, std::numeric_limits<size_t>::max()>;
 
+template <class TX = void> // actually not a template
 class Rule {
-protected:
-    inline Rule() {} // force singleton
+private:
+    inline Rule() = delete; // force static
 
-    // virtual ~Rule() {}
+    // virtual ~Rule() = delete;
 };
 
 template <class N>
-class RuleNamed: public Rule {
-protected:
-    inline RuleNamed(): Rule() {}
-
-    // virtual ~RuleNamed() {}
-};
+class RuleNamed: public Rule<> {};
 
 // need specialize
 template <class N>
@@ -45,7 +41,7 @@ public:
     template <class T>
     using Result = T;
 
-    static std::pair<Node *, Node *> parse(
+    static std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     );
 };
@@ -64,7 +60,7 @@ public:
 
 private:
     template <size_t I, class R, class... Rx>
-    static MYPARSER_INLINE std::pair<Node *, Node *> runRule(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> runRule(
         Input &input, const Input &end
     ) {
         using Line = typename R::template Helper<N, I>;
@@ -92,7 +88,7 @@ private:
     }
 
     template <size_t I> // iteration finished
-    static MYPARSER_INLINE std::pair<Node *, Node *> runRule(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> runRule(
         Input &input, const Input &end
     ) {
         (void) end;
@@ -103,13 +99,8 @@ private:
         };
     }
 
-protected:
-    MYPARSER_INLINE RuleList(): RuleNamed<N>() {}
-
-    // virtual ~RuleList() {}
-
 public:
-    static std::pair<Node *, Node *> parse(
+    static std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     ) {
         return runRule<0, RL...>(input, end);
@@ -123,7 +114,7 @@ public:
     using Result = NodeTypedText<N>;
 
 private:
-    static MYPARSER_INLINE std::pair<Node *, Node *> runRegex(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> runRegex(
         Input &input, const Input &end
     ) {
         #if defined(MYPARSER_BOOST_XPRESSIVE)
@@ -170,13 +161,8 @@ private:
         }
     }
 
-protected:
-    MYPARSER_INLINE RuleRegex(): RuleNamed<N>() {}
-
-    // virtual ~RuleRegex() {}
-
 public:
-    static std::pair<Node *, Node *> parse(
+    static std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     ) {
         return runRegex(input, end);
@@ -188,7 +174,7 @@ public:
 template <class N = BuiltinSpace, class TAG = TagNormal>
 class RuleItemSpace: public TAG {
 public:
-    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     ) {
         return RuleDef<N>::parse(input, end);
@@ -198,7 +184,7 @@ public:
 template <class KW, class N = BuiltinKeyword, class TAG = TagNormal>
 class RuleItemKeyword: public TAG {
 public:
-    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     ) {
         auto current = RuleDef<N>::parse(input, end);
@@ -236,7 +222,7 @@ public:
 template <class N, class TAG = TagNormal>
 class RuleItemRef: public TAG {
 public:
-    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     ) {
         return RuleDef<N>::parse(input, end);
@@ -246,7 +232,7 @@ public:
 template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
-    static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+    static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
         Input &input, const Input &end
     ) {
         (void) end;
@@ -272,7 +258,7 @@ public:
     private:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
-            Result<> *&result, Node *&err, size_t &errpos,
+            Result<> *&result, Node<> *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
@@ -303,7 +289,7 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            Result<> *&result, Node *&err, size_t &errpos,
+            Result<> *&result, Node<> *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             (void) result;
@@ -316,13 +302,13 @@ public:
         }
 
     public:
-        static MYPARSER_INLINE std::pair<Node *, Node *> parse(
+        static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
             Input &input, const Input &end
         ) {
             Result<> *result = new Result<>(input);
             Result<> *result_err = new Result<>(input);
 
-            Node *err = nullptr;
+            Node<> *err = nullptr;
             size_t errpos = 0;
 
             bool succeed = runRule<RL...>(result, err, errpos, input, end);
@@ -353,7 +339,7 @@ public:
 template <class N = BuiltinRoot>
 class Parser {
 public:
-    static inline Node *parse(
+    static inline Node<> *parse(
         Input &input, const Input &end, bool dothrow = true
     ) {
         auto current = RuleDef<N>::parse(input, end);
@@ -373,7 +359,7 @@ public:
         }
     }
 
-    static inline Node *parse(
+    static inline Node<> *parse(
         const std::string &input, bool dothrow = true
     ) {
         Input iter = input.cbegin();

@@ -13,6 +13,7 @@ using BuiltinSpace = MP_STR("space", 5);
 using BuiltinKeyword = MP_STR("keyword", 7);
 using BuiltinError = MP_STR("error", 5);
 
+template <class TX = void> // actually not a template
 class Node {
 private:
     const Input pos;
@@ -25,13 +26,13 @@ protected:
 public:
     virtual ~Node() {} // destructable (public)
 
-    virtual inline void free() { // hack // TODO
+    virtual void free() {
         delete this;
     }
 
     virtual bool empty() const = 0;
 
-    virtual void runPass(PassBase *pass) const = 0;
+    virtual void runPass(PassBase<> *pass) const = 0;
 
     virtual const std::string &getRuleName() const = 0;
 
@@ -55,7 +56,7 @@ public:
         return pos + getLen();
     }
 
-    inline Node *challengeLonger(Node *target) {
+    inline Node<> *challengeLonger(Node<> *target) {
         if (!target) {
             return this;
         }
@@ -71,16 +72,16 @@ public:
 };
 
 template <class TX = void> // actually not a template
-class NodeList: public Node {
+class NodeList: public Node<> {
 private:
-    std::vector<Node *> children;
+    std::vector<Node<> *> children;
 
     size_t basepos;
     NodeList<> *brother = nullptr;
 
 protected:
     inline NodeList(const Input &input):
-        Node(input), children() {}
+        Node<>(input), children() {}
 
 public:
     virtual ~NodeList() {
@@ -98,7 +99,7 @@ public:
     }
 
     virtual bool empty() const {
-        for (Node *child: children) {
+        for (Node<> *child: children) {
             if (!child->empty()) {
                 return false;
             }
@@ -112,14 +113,14 @@ public:
         basepos = pos;
     }
 
-    inline void putChild(Node *value) {
+    inline void putChild(Node<> *value) {
         children.push_back(value);
     }
 
     virtual size_t getLen() const {
         size_t result = 0;
 
-        for (Node *child: children) {
+        for (Node<> *child: children) {
             result += child->getLen();
         }
 
@@ -127,12 +128,12 @@ public:
     }
 
     virtual void getFullText(std::ostream &out) const {
-        for (Node *child: children) {
+        for (Node<> *child: children) {
             child->getFullText(out);
         }
     }
 
-    inline const std::vector<Node *> &getChildren() const {
+    inline const std::vector<Node<> *> &getChildren() const {
         return children;
     }
 };
@@ -141,7 +142,7 @@ template <size_t I>
 class NodeListIndexed: public NodeList<> {
 public:
     inline NodeListIndexed(const Input &input):
-        NodeList(input) {}
+        NodeList<>(input) {}
 
     // virtual ~NodeListIndexed() {}
 
@@ -151,18 +152,18 @@ public:
 };
 
 template <class TX = void> // actually not a template
-class NodeText: public Node {
+class NodeText: public Node<> {
 private:
     const std::string text;
 
 protected:
     inline NodeText(
         const Input &input, std::string &&value
-    ): Node(input), text(std::move(value)) {}
+    ): Node<>(input), text(std::move(value)) {}
 
     inline NodeText(
         const Input &input, const std::string &value
-    ): Node(input), text(value) {}
+    ): Node<>(input), text(value) {}
 
 public:
     // virtual ~NodeText() {}
@@ -193,7 +194,9 @@ class NodeTextPure: public NodeText<> {
 public:
     inline NodeTextPure(
         const Input &input, std::string &&value
-    ): NodeText(input, std::move(value)) {}
+    ): NodeText<>(input, std::move(value)) {}
+
+    // virtual ~NodeTextPure() {}
 };
 
 template <class KW>
@@ -201,7 +204,9 @@ class NodeTextKeyword: public NodeText<> {
 public:
     inline NodeTextKeyword(
         const Input &input
-    ): NodeText(input, KW::getStr()) {}
+    ): NodeText<>(input, KW::getStr()) {}
+
+    // virtual ~NodeTextKeyword() {}
 };
 
 template <class E>
@@ -209,14 +214,16 @@ class NodeTextOrError: public NodeText<> {
 public:
     inline NodeTextOrError(
         const Input &input, std::string &&value
-    ): NodeText(input, std::move(value)) {}
+    ): NodeText<>(input, std::move(value)) {}
+
+    // virtual ~NodeTextOrError() {}
 };
 
 template <class E>
-class NodeError: public Node {
+class NodeError: public Node<> {
 public:
     inline NodeError(const Input &input):
-        Node(input) {}
+        Node<>(input) {}
 
     // virtual ~NodeError() {}
 
@@ -267,7 +274,7 @@ class NodeTyped: public T {
 public:
     using T::T;
 
-    virtual void runPass(PassBase *pass) const {
+    virtual void runPass(PassBase<> *pass) const {
         Pass<I>::call(pass, pass->getId(), this);
     }
 

@@ -40,7 +40,7 @@ public:
 
     template <size_t I>
     void run(const NodeSpace<I> *node) {
-        putSpace(node->Node::getFullText());
+        putSpace(node->Node<>::getFullText());
     }
 
     template <class T, class E>
@@ -56,7 +56,7 @@ public:
 
     template <size_t I>
     void run(const NodeListIndexed<I> *node) {
-        for (const Node *child: node->getChildren()) {
+        for (const Node<> *child: node->getChildren()) {
             child->runPass(this);
         }
     }

@@ -5,6 +5,7 @@
 
 namespace myparser {
 
+template <class TX = void> // actually not a template
 class PassBase {
 private:
     size_t id;
@@ -21,17 +22,15 @@ public:
 };
 
 template <size_t I>
-class PassProto: public PassBase {
+class PassProto: public PassBase<> {
 public:
-    inline PassProto(): PassBase(I) {}
+    inline PassProto(): PassBase<>(I) {}
 
     // virtual ~PassProto() {}
 
-    // TODO: add run() with template, hold bad calls
-
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase *pass, const size_t target, const T *node
+        PassBase<> *pass, const size_t target, const T *node
     ) {
         if (target == I) {
             ((Pass<I> *) pass)->run(node);
@@ -46,7 +45,7 @@ class Pass {
 public:
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase *pass, const size_t target, const T *node
+        PassBase<> *pass, const size_t target, const T *node
     ) {
         Pass<I + 1>::call(pass, target, node);
     }
@@ -57,7 +56,7 @@ class Pass<PASS_FIN> {
 public:
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase *pass, const size_t target, const T *node
+        PassBase<> *pass, const size_t target, const T *node
     ) {
         // never reach
         (void) pass;

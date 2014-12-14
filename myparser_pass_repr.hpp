@@ -71,17 +71,17 @@ public:
         putName(node->getRuleName());
         putIndex(I); // getIndex() == I
 
-        std::vector<Node *> children1;
+        std::vector<Node<> *> children1;
 
         if (!optionV) {
-            for (Node *child: node->getChildren()) {
+            for (Node<> *child: node->getChildren()) {
                 if (!child->empty()) {
                     children1.push_back(child);
                 }
             }
         }
 
-        const std::vector<Node *> &children =
+        const std::vector<Node<> *> &children =
             optionV ? node->getChildren() : children1;
 
         if (optionC && children.size() == 1) {
@@ -95,7 +95,7 @@ public:
             ++indent;
 
             bool first = true;
-            for (const Node *child: children) {
+            for (const Node<> *child: children) {
                 putLn(first);
                 first = false;
                 child->runPass(this);
