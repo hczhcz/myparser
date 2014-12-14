@@ -23,7 +23,7 @@ using TagMaybe = Tag<0, 1>;
 using TagAny0 = Tag<0, std::numeric_limits<size_t>::max()>;
 using TagAny1 = Tag<1, std::numeric_limits<size_t>::max()>;
 
-template <class TX = void> // actually not a template
+template <class N>
 class Rule {
 private:
     inline Rule() = delete; // force static
@@ -31,12 +31,9 @@ private:
     // virtual ~Rule() = delete;
 };
 
-template <class N>
-class RuleNamed: public Rule<> {};
-
 // need specialize
 template <class N>
-class RuleDef: public RuleNamed<N> {
+class RuleDef: public Rule<N> {
 public:
     template <class T>
     using Result = T;
@@ -47,12 +44,12 @@ public:
 };
 
 template <>
-class RuleDef<BuiltinError>: public RuleNamed<BuiltinError> {};
+class RuleDef<BuiltinError>: public Rule<BuiltinError> {};
 
 //////// Named ////////
 
 template <class N, class... RL>
-class RuleList: public RuleNamed<N> {
+class RuleList: public Rule<N> {
 public:
     template <size_t I>
     using Result = NodeTypedList<N, I>;
@@ -108,7 +105,7 @@ public:
 };
 
 template <class N, class RX>
-class RuleRegex: public RuleNamed<N> {
+class RuleRegex: public Rule<N> {
 public:
     template <class TX = void> // actually not a template
     using Result = NodeTypedText<N>;
