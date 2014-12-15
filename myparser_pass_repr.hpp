@@ -188,7 +188,7 @@ template <class TX = void> // actually not a template
 class PassReprSimple: public Pass<PASS_REPR> {
 protected:
     virtual void putText(const std::string &text) {
-        out << style_data << text << style_normal;
+        out << style_string << text << style_normal;
     }
 
     virtual void putKeyword(const std::string &text) {
@@ -230,12 +230,12 @@ protected:
 
     virtual void putIndex(const size_t index) {
         out << '[';
-        out << style_number << index << style_normal;
+        out << style_data << index << style_normal;
         out << ']';
     }
 
     virtual void putText(const std::string &text) {
-        out << style_data << text << style_normal;
+        out << style_string << text << style_normal;
     }
 
     virtual void putKeyword(const std::string &text) {

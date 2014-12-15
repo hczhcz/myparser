@@ -18,11 +18,11 @@ protected:
         out << text;
     }
 
-    virtual void putNumber(const std::string &text) {
+    virtual void putData(const std::string &text) {
         out << text;
     }
 
-    virtual void putData(const std::string &text) {
+    virtual void putString(const std::string &text) {
         out << text;
     }
 
@@ -45,11 +45,12 @@ public:
 
     template <class T, class E>
     void run(const NodeData<T, E> *node) {
-        if (std::is_arithmetic<T>::value) {
-            putNumber(node->getText());
-        } else {
-            putData(node->getText());
-        }
+        putData(node->getText());
+    }
+
+    template <size_t QL, size_t QR, char EC, class E>
+    void run(const NodeString<QL, QR, EC, E> *node) {
+        putString(node->getText());
     }
 
     // common nodes
@@ -92,12 +93,12 @@ protected:
         out << style_space << text << style_normal;
     }
 
-    virtual void putNumber(const std::string &text) {
-        out << style_number << text << style_normal;
-    }
-
     virtual void putData(const std::string &text) {
         out << style_data << text << style_normal;
+    }
+
+    virtual void putString(const std::string &text) {
+        out << style_string << text << style_normal;
     }
 
     virtual void putKeyword(const std::string &text) {
