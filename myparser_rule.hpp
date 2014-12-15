@@ -337,7 +337,7 @@ template <class N = BuiltinRoot>
 class Parser {
 public:
     static inline Node<> *parse(
-        Input &input, const Input &end, bool dothrow = true
+        Input &input, const Input &end, const bool dothrow = true
     ) {
         auto current = RuleDef<N>::parse(input, end);
 
@@ -357,7 +357,7 @@ public:
     }
 
     static inline Node<> *parse(
-        const std::string &input, bool dothrow = true
+        const std::string &input, const bool dothrow = true
     ) {
         Input iter = input.cbegin();
 
