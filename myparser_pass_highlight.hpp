@@ -18,15 +18,15 @@ protected:
         out << text;
     }
 
+    virtual void putKeyword(const std::string &text) {
+        out << text;
+    }
+
     virtual void putData(const std::string &text) {
         out << text;
     }
 
     virtual void putString(const std::string &text) {
-        out << text;
-    }
-
-    virtual void putKeyword(const std::string &text) {
         out << text;
     }
 
@@ -41,6 +41,11 @@ public:
     template <size_t I>
     void run(const NodeSpace<I> *node) {
         putSpace(node->Node<>::getFullText());
+    }
+
+    template <class TX = void> // actually not a template
+    void run(const NodeKeyword<> *node) {
+        putKeyword(node->getText());
     }
 
     template <class T, class E>
@@ -67,12 +72,6 @@ public:
         putText(node->getText());
     }
 
-    template <class KW>
-    void run(const NodeTextKeyword<KW> *node) {
-        (void) node;
-        putKeyword(KW::getStr()); // getText() == KW::getStr()
-    }
-
     template <class E>
     void run(const NodeTextOrError<E> *node) {
         if (node->accepted()) {
@@ -93,16 +92,16 @@ protected:
         out << style_space << text << style_normal;
     }
 
+    virtual void putKeyword(const std::string &text) {
+        out << style_keyword << text << style_normal;
+    }
+
     virtual void putData(const std::string &text) {
         out << style_data << text << style_normal;
     }
 
     virtual void putString(const std::string &text) {
         out << style_string << text << style_normal;
-    }
-
-    virtual void putKeyword(const std::string &text) {
-        out << style_keyword << text << style_normal;
     }
 
 public:

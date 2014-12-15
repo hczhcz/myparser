@@ -8,8 +8,9 @@ namespace myparser {
 template <size_t I>
 class NodeSpace: public NodeListIndexed<I> {
 public:
-    inline NodeSpace(const Input &input):
-        NodeListIndexed<I>(input) {}
+    inline NodeSpace(
+        const Input &input
+    ): NodeListIndexed<I>(input) {}
 
     // virtual ~NodeSpace() {}
 

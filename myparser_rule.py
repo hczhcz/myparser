@@ -55,7 +55,7 @@ class RuleItemKeyword(object):
         return template['keyword'](self.text)
 
     def compile(self, env):
-        checker = lambda x: x if x == self.text else None
+        checker = lambda x: x if x.get_text() == self.text else None
 
         return lambda val, pos: checker(env[keyword_name](val, pos))
 

@@ -21,7 +21,9 @@ private:
     inline Node() = delete;
 
 protected:
-    inline Node(const Input &input): pos(input) {}
+    inline Node(
+        const Input &input
+    ): pos(input) {}
 
 public:
     virtual ~Node() {} // destructable (public)
@@ -80,8 +82,9 @@ private:
     NodeList<> *brother = nullptr;
 
 protected:
-    inline NodeList(const Input &input):
-        Node<>(input), children() {}
+    inline NodeList(
+        const Input &input
+    ): Node<>(input), children() {}
 
 public:
     virtual ~NodeList() {
@@ -141,8 +144,9 @@ public:
 template <size_t I>
 class NodeListIndexed: public NodeList<> {
 public:
-    inline NodeListIndexed(const Input &input):
-        NodeList<>(input) {}
+    inline NodeListIndexed(
+        const Input &input
+    ): NodeList<>(input) {}
 
     // virtual ~NodeListIndexed() {}
 
@@ -222,8 +226,9 @@ public:
 template <class E>
 class NodeError: public Node<> {
 public:
-    inline NodeError(const Input &input):
-        Node<>(input) {}
+    inline NodeError(
+        const Input &input
+    ): Node<>(input) {}
 
     // virtual ~NodeError() {}
 

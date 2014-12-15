@@ -338,7 +338,7 @@ protected:
 
     virtual void putKeyword(const std::string &text) {
         putLn1();
-        out << "\"text\": \""; // or "keyword: "?
+        out << "\"text\": \"";
         putStrEscaped(text);
         out << "\",";
     }
