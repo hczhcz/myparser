@@ -27,6 +27,10 @@ protected:
         (void) text;
     }
 
+    virtual void putSpace(const std::string &text) {
+        (void) text;
+    }
+
     virtual void putKeyword(const std::string &text) {
         (void) text;
     }
@@ -63,6 +67,36 @@ public:
         out(target), indent(0) {}
 
     // virtual ~Pass() {}
+
+    // specialized nodes
+
+    template <size_t I>
+    void run(const NodeSpace<I> *node) {
+        putMainBegin();
+
+        putName(node->getRuleName());
+
+        putBegin();
+        putSpace(node->Node<>::getFullText());
+        putEnd();
+
+        putMainEnd();
+    }
+
+    template <class TX = void> // actually not a template
+    void run(const NodeKeyword<> *node) {
+        putMainBegin();
+
+        putName(node->getRuleName());
+
+        putBegin();
+        putKeyword(node->getText());
+        putEnd();
+
+        putMainEnd();
+    }
+
+    // common nodes
 
     template <size_t I>
     void run(const NodeListIndexed<I> *node) {
@@ -121,19 +155,6 @@ public:
         putMainEnd();
     }
 
-    template <class KW>
-    void run(const NodeTextKeyword<KW> *node) {
-        putMainBegin();
-
-        putName(node->getRuleName());
-
-        putBegin();
-        putKeyword(KW::getStr());
-        putEnd();
-
-        putMainEnd();
-    }
-
     template <class E>
     void run(const NodeTextOrError<E> *node) {
         putMainBegin();
@@ -172,6 +193,10 @@ protected:
         out << text;
     }
 
+    virtual void putSpace(const std::string &text) {
+        out << text;
+    }
+
     virtual void putKeyword(const std::string &text) {
         out << text;
     }
@@ -189,6 +214,10 @@ class PassReprSimple: public Pass<PASS_REPR> {
 protected:
     virtual void putText(const std::string &text) {
         out << style_string << text << style_normal;
+    }
+
+    virtual void putSpace(const std::string &text) {
+        out << style_space << text << style_normal;
     }
 
     virtual void putKeyword(const std::string &text) {
@@ -236,6 +265,10 @@ protected:
 
     virtual void putText(const std::string &text) {
         out << style_string << text << style_normal;
+    }
+
+    virtual void putSpace(const std::string &text) {
+        out << style_space << text << style_normal;
     }
 
     virtual void putKeyword(const std::string &text) {
@@ -330,6 +363,13 @@ protected:
     }
 
     virtual void putText(const std::string &text) {
+        putLn1();
+        out << "\"text\": \"";
+        putStrEscaped(text);
+        out << "\",";
+    }
+
+    virtual void putSpace(const std::string &text) {
         putLn1();
         out << "\"text\": \"";
         putStrEscaped(text);

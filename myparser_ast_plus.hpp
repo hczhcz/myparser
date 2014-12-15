@@ -19,6 +19,16 @@ public:
     }
 };
 
+template <class TX = void> // actually not a template
+class NodeKeyword: public NodeText<> {
+public:
+    inline NodeKeyword(
+        const Input &input, const std::string &value
+    ): NodeText<>(input, value) {}
+
+    // virtual ~NodeTextKeyword() {}
+};
+
 template <class T, class E>
 class NodeData: public NodeTextOrError<E> {
 private:

@@ -197,7 +197,7 @@ public:
             }
 
             return {
-                new NodeTypedKeyword<BuiltinKeyword, KW>(input),
+                new NodeTypedText<N>(input, KW::getStr()),
                 nullptr
             };
         } else {
@@ -210,7 +210,7 @@ public:
 
             return {
                 nullptr,
-                new NodeTypedError<BuiltinKeyword, ErrorKeyword>(input)
+                new NodeTypedError<N, ErrorKeyword>(input)
             };
         }
     }

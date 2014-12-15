@@ -203,16 +203,6 @@ public:
     // virtual ~NodeTextPure() {}
 };
 
-template <class KW>
-class NodeTextKeyword: public NodeText<> {
-public:
-    inline NodeTextKeyword(
-        const Input &input
-    ): NodeText<>(input, KW::getStr()) {}
-
-    // virtual ~NodeTextKeyword() {}
-};
-
 template <class E>
 class NodeTextOrError: public NodeText<> {
 public:
@@ -261,13 +251,6 @@ public:
 };
 
 // could specialize
-template <class NT, class KW> // NT is always BuiltinKeyword
-class NodeBaseKeyword {
-public:
-    using Type = NodeTextKeyword<KW>;
-};
-
-// could specialize
 template <class NT, class E>
 class NodeBaseError {
 public:
@@ -293,9 +276,6 @@ using NodeTypedList = NodeTyped<NT, typename NodeBaseList<NT, I>::Type>;
 
 template <class NT>
 using NodeTypedText = NodeTyped<NT, typename NodeBaseText<NT>::Type>;
-
-template <class NT, class KW> // NT is always BuiltinKeyword
-using NodeTypedKeyword = NodeTyped<NT, typename NodeBaseKeyword<NT, KW>::Type>;
 
 template <class NT, class E>
 using NodeTypedError = NodeTyped<NT, typename NodeBaseError<NT, E>::Type>;
