@@ -49,7 +49,7 @@ public:
     template <class T>
     static MYPARSER_INLINE void call(
         PassBase<> *pass, const size_t target, const T *node
-    ) const {
+    ) {
         // never reach
         (void) pass;
         (void) target;

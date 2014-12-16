@@ -31,8 +31,9 @@ protected:
     }
 
 public:
-    inline Pass(std::ostream &target):
-        PassProto<PASS_HIGHLIGHT>(), out(target) {}
+    inline Pass(
+        std::ostream &target
+    ): PassProto<PASS_HIGHLIGHT>(), out(target) {}
 
     // virtual ~Pass() {}
 
@@ -105,8 +106,9 @@ protected:
     }
 
 public:
-    inline PassHighlight(std::ostream &target):
-        Pass<PASS_HIGHLIGHT>(target) {}
+    inline PassHighlight(
+        std::ostream &target
+    ): Pass<PASS_HIGHLIGHT>(target) {}
 
     // virtual ~PassHighlight() {}
 };

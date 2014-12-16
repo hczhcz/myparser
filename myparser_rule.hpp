@@ -33,15 +33,7 @@ private:
 
 // need specialize
 template <class N>
-class RuleDef: public Rule<N> {
-public:
-    template <class T>
-    using Result = T;
-
-    static std::pair<Node<> *, Node<> *> parse(
-        Input &input, const Input &end
-    );
-};
+class RuleDef;
 
 template <>
 class RuleDef<BuiltinError>: public Rule<BuiltinError> {};
