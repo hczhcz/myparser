@@ -61,7 +61,7 @@ private:
     std::string raw;
     bool succeed;
 
-    inline char hexMap(const char value) {
+    inline char hexMap(const char value) const {
         if ('0' <= value && value <= '9') {
             return value - '0';
         } else if ('A' <= value && value <= 'F') {
@@ -74,7 +74,7 @@ private:
         }
     }
 
-    inline char hexMap2(const char value1, const char value2) {
+    inline char hexMap2(const char value1, const char value2) const {
         char hi = hexMap(value1);
         char lo = hexMap(value2);
 

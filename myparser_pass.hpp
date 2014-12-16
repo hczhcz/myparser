@@ -16,7 +16,7 @@ protected:
     // virtual ~PassBase() {}
 
 public:
-    inline size_t getId() {
+    inline size_t getId() const {
         return id;
     }
 };
@@ -41,15 +41,7 @@ public:
 };
 
 template <size_t I = 0>
-class Pass {
-public:
-    template <class T>
-    static MYPARSER_INLINE void call(
-        PassBase<> *pass, const size_t target, const T *node
-    ) {
-        Pass<I + 1>::call(pass, target, node);
-    }
-};
+class Pass: public Pass<I + 1> {};
 
 template <>
 class Pass<PASS_FIN> {
@@ -57,7 +49,7 @@ public:
     template <class T>
     static MYPARSER_INLINE void call(
         PassBase<> *pass, const size_t target, const T *node
-    ) {
+    ) const {
         // never reach
         (void) pass;
         (void) target;
