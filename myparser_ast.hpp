@@ -42,7 +42,7 @@ public:
 
     virtual void getFullText(std::ostream &out) const = 0;
 
-    inline const std::string getFullText() const {
+    inline const std::string asFullText() const {
         std::ostringstream result;
 
         getFullText(result);

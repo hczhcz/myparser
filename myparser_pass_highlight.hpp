@@ -41,7 +41,7 @@ public:
 
     template <size_t I>
     void run(const NodeSpace<I> *node) {
-        putSpace(node->Node<>::getFullText());
+        putSpace(node->Node<>::asFullText());
     }
 
     template <class TX = void> // actually not a template
