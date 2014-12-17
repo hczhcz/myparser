@@ -237,21 +237,21 @@ public:
 };
 
 // could specialize
-template <class NT, size_t I>
+template <class N, size_t I>
 class NodeBaseList {
 public:
     using Type = NodeListIndexed<I>;
 };
 
 // could specialize
-template <class NT>
+template <class N>
 class NodeBaseText {
 public:
     using Type = NodeTextPure<>;
 };
 
 // could specialize
-template <class NT, class E>
+template <class N, class E>
 class NodeBaseError {
 public:
     using Type = NodeError<E>;
@@ -271,14 +271,14 @@ public:
     }
 };
 
-template <class NT, size_t I>
-using NodeTypedList = NodeTyped<NT, typename NodeBaseList<NT, I>::Type>;
+template <class N, size_t I>
+using NodeTypedList = NodeTyped<N, typename NodeBaseList<N, I>::Type>;
 
-template <class NT>
-using NodeTypedText = NodeTyped<NT, typename NodeBaseText<NT>::Type>;
+template <class N>
+using NodeTypedText = NodeTyped<N, typename NodeBaseText<N>::Type>;
 
-template <class NT, class E>
-using NodeTypedError = NodeTyped<NT, typename NodeBaseError<NT, E>::Type>;
+template <class N, class E>
+using NodeTypedError = NodeTyped<N, typename NodeBaseError<N, E>::Type>;
 
 }
 

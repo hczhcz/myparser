@@ -92,7 +92,7 @@ enum {
 
 // forward declaration
 
-template <size_t I>
+template <size_t>
 class Pass;
 
 }
