@@ -237,9 +237,10 @@ public:
 };
 
 // could specialize
-template <class N, size_t I>
+template <class N>
 class NodeBaseList {
 public:
+    template <size_t I>
     using Type = NodeListIndexed<I>;
 };
 
@@ -247,13 +248,15 @@ public:
 template <class N>
 class NodeBaseText {
 public:
+    template <class TX = void> // actually not a template
     using Type = NodeTextPure<>;
 };
 
 // could specialize
-template <class N, class E>
+template <class N>
 class NodeBaseError {
 public:
+    template <class E>
     using Type = NodeError<E>;
 };
 
@@ -272,13 +275,13 @@ public:
 };
 
 template <class N, size_t I>
-using NodeTypedList = NodeTyped<N, typename NodeBaseList<N, I>::Type>;
+using NodeTypedList = NodeTyped<N, typename NodeBaseList<N>::template Type<I>>;
 
 template <class N>
-using NodeTypedText = NodeTyped<N, typename NodeBaseText<N>::Type>;
+using NodeTypedText = NodeTyped<N, typename NodeBaseText<N>::template Type<>>;
 
 template <class N, class E>
-using NodeTypedError = NodeTyped<N, typename NodeBaseError<N, E>::Type>;
+using NodeTypedError = NodeTyped<N, typename NodeBaseError<N>::template Type<E>>;
 
 }
 
