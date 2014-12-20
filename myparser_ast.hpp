@@ -39,14 +39,8 @@ public:
 
     virtual const std::string &getRuleName() const = 0;
 
-    virtual void getFullText(std::ostream &out) const = 0;
-
-    inline const std::string asFullText() const {
-        std::ostringstream result;
-
-        getFullText(result);
-
-        return result.str();
+    inline const std::string getFullText() const {
+        return std::string(pos, tail);
     }
 
     inline const Input &getPos() const {
@@ -120,12 +114,6 @@ public:
         tail = value->getTail();
     }
 
-    virtual void getFullText(std::ostream &out) const {
-        for (Node<> *child: children) {
-            child->getFullText(out);
-        }
-    }
-
     inline const std::vector<Node<> *> &getChildren() const {
         return children;
     }
@@ -145,6 +133,7 @@ public:
     }
 };
 
+// TODO: remove .text and use getFullText() with cache
 template <class TX = void> // actually not a template
 class NodeText: public Node<> {
 private:
@@ -172,10 +161,6 @@ public:
 
     virtual bool empty() const {
         return accepted() && text.size() == 0;
-    }
-
-    virtual void getFullText(std::ostream &out) const {
-        out << text;
     }
 
     inline const std::string &getText() const {
@@ -214,11 +199,6 @@ public:
 
     virtual bool empty() const {
         return false;
-    }
-
-    virtual void getFullText(std::ostream &out) const {
-        // nothing
-        (void) out;
     }
 };
 

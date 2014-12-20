@@ -181,7 +181,7 @@ public:
         if (
             current.first
             &&
-            current.first->asFullText() == KW::getStr()
+            current.first->getFullText() == KW::getStr()
         ) {
             current.first->free();
             if (current.second) {

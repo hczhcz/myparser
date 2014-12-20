@@ -77,7 +77,7 @@ public:
         putName(node->getRuleName());
 
         putBegin();
-        putSpace(node->Node<>::asFullText());
+        putSpace(node->Node<>::getFullText());
         putEnd();
 
         putMainEnd();
