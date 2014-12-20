@@ -64,6 +64,7 @@ namespace myparser {
 
 #if defined(MYPARSER_AST_CCC)
     const auto style_normal = ccc::d_all;
+    const auto style_underline = ccc::s_underline_single;
 
     const auto style_error = ccc::cf_red + ccc::s_bold;
     const auto style_space = ccc::s_faint;
@@ -72,6 +73,7 @@ namespace myparser {
     const auto style_string = ccc::cf_yellow + ccc::s_bold;
 #else
     const auto style_normal = "";
+    const auto style_underline = ccc::s_underline_single;
 
     const auto style_error = "";
     const auto style_space = "";
