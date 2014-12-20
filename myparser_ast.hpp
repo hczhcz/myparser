@@ -16,14 +16,15 @@ using BuiltinError = MP_STR("error", 5);
 template <class TX = void> // actually not a template
 class Node {
 private:
-    const Input pos;
-
     inline Node() = delete;
 
 protected:
     inline Node(
         const Input &input
-    ): pos(input) {}
+    ): pos(input), tail(input) {}
+
+    const Input pos;
+    Input tail;
 
 public:
     virtual ~Node() {} // destructable (public)
@@ -37,8 +38,6 @@ public:
     virtual void runPass(PassBase<> *pass) const = 0;
 
     virtual const std::string &getRuleName() const = 0;
-
-    virtual size_t getLen() const = 0;
 
     virtual void getFullText(std::ostream &out) const = 0;
 
@@ -54,8 +53,8 @@ public:
         return pos;
     }
 
-    inline const Input getTail() const {
-        return pos + getLen();
+    inline const Input &getTail() const {
+        return tail;
     }
 
     inline Node<> *challengeLonger(Node<> *target) {
@@ -118,16 +117,7 @@ public:
 
     inline void putChild(Node<> *value) {
         children.push_back(value);
-    }
-
-    virtual size_t getLen() const {
-        size_t result = 0;
-
-        for (Node<> *child: children) {
-            result += child->getLen();
-        }
-
-        return result;
+        tail = value->getTail();
     }
 
     virtual void getFullText(std::ostream &out) const {
@@ -163,11 +153,15 @@ private:
 protected:
     inline NodeText(
         const Input &input, std::string &&value
-    ): Node<>(input), text(std::move(value)) {}
+    ): Node<>(input), text(std::move(value)) {
+        tail = tail + text.size();
+    }
 
     inline NodeText(
         const Input &input, const std::string &value
-    ): Node<>(input), text(value) {}
+    ): Node<>(input), text(value) {
+        tail = tail + text.size();
+    }
 
 public:
     // virtual ~NodeText() {}
@@ -178,10 +172,6 @@ public:
 
     virtual bool empty() const {
         return accepted() && text.size() == 0;
-    }
-
-    virtual size_t getLen() const {
-        return text.size();
     }
 
     virtual void getFullText(std::ostream &out) const {
@@ -224,10 +214,6 @@ public:
 
     virtual bool empty() const {
         return false;
-    }
-
-    virtual size_t getLen() const {
-        return 0;
     }
 
     virtual void getFullText(std::ostream &out) const {
