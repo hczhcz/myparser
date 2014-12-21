@@ -18,13 +18,17 @@ class Node {
 private:
     inline Node() = delete;
 
+    const Input pos;
+    Input tail;
+
 protected:
     inline Node(
         const Input &input
     ): pos(input), tail(input) {}
 
-    const Input pos;
-    Input tail;
+    inline void seek(const Input &end) {
+        tail = end;
+    }
 
 public:
     virtual ~Node() {} // destructable (public)
@@ -111,7 +115,7 @@ public:
 
     inline void putChild(Node<> *value) {
         children.push_back(value);
-        tail = value->getTail();
+        seek(value->getTail());
     }
 
     inline const std::vector<Node<> *> &getChildren() const {
@@ -143,13 +147,13 @@ protected:
     inline NodeText(
         const Input &input, std::string &&value
     ): Node<>(input), text(std::move(value)) {
-        tail = tail + text.size();
+        seek(getTail() + text.size());
     }
 
     inline NodeText(
         const Input &input, const std::string &value
     ): Node<>(input), text(value) {
-        tail = tail + text.size();
+        seek(getTail() + text.size());
     }
 
 public:
