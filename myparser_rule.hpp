@@ -126,21 +126,15 @@ private:
                 regex_lib::regex_constants::match_continuous
             )
         ) {
-            std::string str = mdata.str();
-            input += str.size();
-
             Result<> *result =
-                new Result<>(input, std::move(str));
+                new Result<>(input, input + mdata.length());
 
             if (result->accepted()) {
+                input += mdata.length();
+
                 return {result, nullptr};
             } else {
-                delete result;
-
-                return {
-                    nullptr,
-                    new NodeTypedError<N, ErrorChecking>(input)
-                };
+                return {nullptr, result};
             }
         } else {
             return {
@@ -183,15 +177,16 @@ public:
             &&
             current.first->getFullText() == KW::getStr()
         ) {
+            Node<> *result = new NodeTypedText<N>(
+                current.first->getPos(), current.first->getTail()
+            );
+
             current.first->free();
             if (current.second) {
                 current.second->free();
             }
 
-            return {
-                new NodeTypedText<N>(input, KW::getStr()),
-                nullptr
-            };
+            return {result, nullptr};
         } else {
             if (current.first) {
                 current.first->free();

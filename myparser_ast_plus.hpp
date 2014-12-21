@@ -23,8 +23,8 @@ template <class TX = void> // actually not a template
 class NodeKeyword: public NodeText<> {
 public:
     inline NodeKeyword(
-        const Input &input, const std::string &value
-    ): NodeText<>(input, value) {}
+        const Input &input, const Input &end
+    ): NodeText<>(input, end) {}
 
     // virtual ~NodeTextKeyword() {}
 };
@@ -37,9 +37,10 @@ private:
 
 public:
     inline NodeData(
-        const Input &input, std::string &&value
-    ): NodeTextOrError<E>(input, std::move(value)) {
-        std::istringstream conv(NodeTextOrError<E>::getText());
+        const Input &input, const Input &end
+    ): NodeTextOrError<E>(input, end) {
+        // TODO: optimize?
+        std::istringstream conv(std::string(input, end));
 
         succeed = (conv >> data) && conv.eof();
     }
@@ -87,9 +88,9 @@ private:
 
 public:
     inline NodeString(
-        const Input &input, std::string &&value
-    ): NodeTextOrError<E>(input, std::move(value)) {
-        const std::string &text = NodeTextOrError<E>::getText();
+        const Input &input, const Input &end
+    ): NodeTextOrError<E>(input, end) {
+        const std::string text(input, end); // TODO: just use iter
         std::ostringstream result;
 
         for (size_t i = QL; i < text.size() - QR; ++i) {

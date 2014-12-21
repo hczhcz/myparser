@@ -90,7 +90,7 @@ public:
         putName(node->getRuleName());
 
         putBegin();
-        putKeyword(node->getText());
+        putKeyword(node->getFullText());
         putEnd();
 
         putMainEnd();
@@ -149,7 +149,7 @@ public:
         putName(node->getRuleName());
 
         putBegin();
-        putText(node->getText());
+        putText(node->getFullText());
         putEnd();
 
         putMainEnd();
@@ -163,7 +163,7 @@ public:
 
         putBegin();
         if (node->accepted()) {
-            putText(node->getText());
+            putText(node->getFullText());
         } else {
             putError(E::getStr());
         }

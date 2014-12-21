@@ -43,6 +43,7 @@ public:
 
     virtual const std::string &getRuleName() const = 0;
 
+    // TODO: cache?
     inline const std::string getFullText() const {
         return std::string(pos, tail);
     }
@@ -137,23 +138,13 @@ public:
     }
 };
 
-// TODO: remove .text and use getFullText() with cache
 template <class TX = void> // actually not a template
 class NodeText: public Node<> {
-private:
-    const std::string text;
-
 protected:
     inline NodeText(
-        const Input &input, std::string &&value
-    ): Node<>(input), text(std::move(value)) {
-        seek(getTail() + text.size());
-    }
-
-    inline NodeText(
-        const Input &input, const std::string &value
-    ): Node<>(input), text(value) {
-        seek(getTail() + text.size());
+        const Input &input, const Input &end
+    ): Node<>(input) {
+        seek(end);
     }
 
 public:
@@ -164,11 +155,7 @@ public:
     }
 
     virtual bool empty() const {
-        return accepted() && text.size() == 0;
-    }
-
-    inline const std::string &getText() const {
-        return text;
+        return accepted() && (getPos() == getTail());
     }
 };
 
@@ -176,8 +163,8 @@ template <class TX = void> // actually not a template
 class NodeTextPure: public NodeText<> {
 public:
     inline NodeTextPure(
-        const Input &input, std::string &&value
-    ): NodeText<>(input, std::move(value)) {}
+        const Input &input, const Input &end
+    ): NodeText<>(input, end) {}
 
     // virtual ~NodeTextPure() {}
 };
@@ -186,8 +173,8 @@ template <class E>
 class NodeTextOrError: public NodeText<> {
 public:
     inline NodeTextOrError(
-        const Input &input, std::string &&value
-    ): NodeText<>(input, std::move(value)) {}
+        const Input &input, const Input &end
+    ): NodeText<>(input, end) {}
 
     // virtual ~NodeTextOrError() {}
 };

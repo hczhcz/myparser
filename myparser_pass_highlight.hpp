@@ -46,17 +46,17 @@ public:
 
     template <class TX = void> // actually not a template
     void run(const NodeKeyword<> *node) {
-        putKeyword(node->getText());
+        putKeyword(node->getFullText());
     }
 
     template <class T, class E>
     void run(const NodeData<T, E> *node) {
-        putData(node->getText());
+        putData(node->getFullText());
     }
 
     template <size_t QL, size_t QR, char EC, class E>
     void run(const NodeString<QL, QR, EC, E> *node) {
-        putString(node->getText());
+        putString(node->getFullText());
     }
 
     // common nodes
@@ -70,13 +70,13 @@ public:
 
     template <class TX = void> // actually not a template
     void run(const NodeTextPure<> *node) {
-        putText(node->getText());
+        putText(node->getFullText());
     }
 
     template <class E>
     void run(const NodeTextOrError<E> *node) {
         if (node->accepted()) {
-            putText(node->getText());
+            putText(node->getFullText());
         }
     }
 
