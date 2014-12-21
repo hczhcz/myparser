@@ -41,11 +41,11 @@ public:
 
     template <size_t I>
     void run(const NodeSpace<I> *node) {
-        putSpace(node->Node<>::getFullText());
+        putSpace(node->getFullText());
     }
 
-    template <class TX = void> // actually not a template
-    void run(const NodeKeyword<> *node) {
+    template <size_t I>
+    void run(const NodeKeyword<I> *node) {
         putKeyword(node->getFullText());
     }
 

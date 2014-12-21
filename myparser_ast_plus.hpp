@@ -19,14 +19,14 @@ public:
     }
 };
 
-template <class TX = void> // actually not a template
-class NodeKeyword: public NodeText<> {
+template <size_t I>
+class NodeKeyword: public NodeListIndexed<I> {
 public:
     inline NodeKeyword(
-        const Input &input, const Input &end
-    ): NodeText<>(input, end) {}
+        const Input &input
+    ): NodeListIndexed<I>(input) {}
 
-    // virtual ~NodeTextKeyword() {}
+    // virtual ~NodeKeyword() {}
 };
 
 template <class T, class E>

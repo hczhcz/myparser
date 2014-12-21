@@ -77,14 +77,14 @@ public:
         putName(node->getRuleName());
 
         putBegin();
-        putSpace(node->Node<>::getFullText());
+        putSpace(node->getFullText());
         putEnd();
 
         putMainEnd();
     }
 
-    template <class TX = void> // actually not a template
-    void run(const NodeKeyword<> *node) {
+    template <size_t I>
+    void run(const NodeKeyword<I> *node) {
         putMainBegin();
 
         putName(node->getRuleName());

@@ -177,16 +177,7 @@ public:
             &&
             current.first->getFullText() == KW::getStr()
         ) {
-            Node<> *result = new NodeTypedText<N>(
-                current.first->getPos(), current.first->getTail()
-            );
-
-            current.first->free();
-            if (current.second) {
-                current.second->free();
-            }
-
-            return {result, nullptr};
+            return current;
         } else {
             if (current.first) {
                 current.first->free();
