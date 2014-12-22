@@ -1,7 +1,7 @@
 #ifndef MYPARSER_PASS_REPR_HPP
 #define MYPARSER_PASS_REPR_HPP
 
-#include "myparser_ast_plus.hpp"
+#include "myparser_ast_spec.hpp"
 
 namespace myparser {
 

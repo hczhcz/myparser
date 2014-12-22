@@ -1,5 +1,5 @@
-#ifndef MYPARSER_AST_PLUS_HPP
-#define MYPARSER_AST_PLUS_HPP
+#ifndef MYPARSER_AST_SPEC_HPP
+#define MYPARSER_AST_SPEC_HPP
 
 #include "myparser_ast.hpp"
 
@@ -178,6 +178,22 @@ public:
     inline const std::string &getRaw() const {
         return raw;
     }
+};
+
+// specialization
+
+template <>
+class NodeBaseList<BuiltinSpace> {
+public:
+    template <size_t I>
+    using Type = NodeSpace<I>;
+};
+
+template <>
+class NodeBaseList<BuiltinKeyword> {
+public:
+    template <size_t I>
+    using Type = NodeKeyword<I>;
 };
 
 }
