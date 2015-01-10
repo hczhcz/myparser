@@ -335,11 +335,11 @@ public:
     }
 
     static inline Node<> *parse(
-        const std::string &input, const bool dothrow = true
+        const std::string &text, const bool dothrow = true
     ) {
-        Input iter = input.cbegin();
+        Input input = text.cbegin();
 
-        return parse(iter, input.cend(), dothrow);
+        return parse(input, text.cend(), dothrow);
     }
 };
 

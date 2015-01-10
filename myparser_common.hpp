@@ -12,11 +12,12 @@
     #endif
 
     // use boost instead of libstdc++
-    #if defined(__GLIBCXX__)
-        #define MYPARSER_BOOST_XPRESSIVE
-    #else
-        #define MYPARSER_STD_REGEX
-    #endif
+    // #if defined(__GLIBCXX__)
+    //     #define MYPARSER_BOOST_XPRESSIVE
+    // #else
+    //     #define MYPARSER_STD_REGEX
+    // #endif
+    #define MYPARSER_STD_REGEX
 #endif
 
 // library
