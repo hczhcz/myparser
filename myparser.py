@@ -44,6 +44,9 @@ class MyParser(object):
                         result.string[result.start():result.end()]
                     )
 
+    def add_file(self, filename):
+        self.add_rules(open(filename, 'r').readlines())
+
     def dump(self):
         return os.linesep.join([
             item.dump() for item in self.rule_list
