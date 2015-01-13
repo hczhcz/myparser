@@ -40,7 +40,7 @@ public:
     }
 };
 
-template <size_t I = 0>
+template <size_t I>
 class Pass: public Pass<I + 1> {};
 
 template <>
@@ -54,8 +54,16 @@ public:
         (void) pass;
         (void) target;
         (void) node;
+        throw;
     }
 };
+
+template <class T, size_t I = 0>
+void passCall(
+    PassBase<> *pass, const T *node
+) {
+    Pass<I>::call(pass, pass->getId(), node); // TODO: ?
+}
 
 }
 

@@ -42,11 +42,6 @@ class RuleDef<BuiltinError>: public Rule<BuiltinError> {};
 
 template <class N, class... RL>
 class RuleList: public Rule<N> {
-public:
-    template <size_t I>
-    using Result = NodeTypedList<N, I>;
-    // == Helper::Result<>
-
 private:
     template <size_t I, class R, class... Rx>
     static MYPARSER_INLINE std::pair<Node<> *, Node<> *> runRule(
@@ -99,7 +94,6 @@ public:
 template <class N, class RX>
 class RuleRegex: public Rule<N> {
 public:
-    template <class TX = void> // actually not a template
     using Result = NodeTypedText<N>;
 
 private:
@@ -126,8 +120,8 @@ private:
                 regex_lib::regex_constants::match_continuous
             )
         ) {
-            Result<> *result =
-                new Result<>(input, input + mdata.length());
+            Result *result =
+                new Result(input, input + mdata.length());
 
             if (result->accepted()) {
                 input += mdata.length();
@@ -227,13 +221,12 @@ public:
     template <class N, size_t I>
     class Helper {
     public:
-        template <class TX = void> // actually not a template
         using Result = NodeTypedList<N, I>;
 
     private:
         template <class R, class... Rx>
         static MYPARSER_INLINE bool runRule(
-            Result<> *&result, Node<> *&err, size_t &errpos,
+            Result *&result, Node<> *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             for (size_t i = 0; i < R::most; ++i) {
@@ -264,7 +257,7 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            Result<> *&result, Node<> *&err, size_t &errpos,
+            Result *&result, Node<> *&err, size_t &errpos,
             Input &input, const Input &end
         ) {
             (void) result;
@@ -280,8 +273,8 @@ public:
         static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
             Input &input, const Input &end
         ) {
-            Result<> *result = new Result<>(input);
-            Result<> *result_err = new Result<>(input);
+            Result *result = new Result(input);
+            Result *result_err = new Result(input);
 
             Node<> *err = nullptr;
             size_t errpos = 0;

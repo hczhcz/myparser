@@ -217,13 +217,13 @@ public:
     using Type = NodeError<E>;
 };
 
-template <class N, class T, size_t I = 0 /* bind later */>
+template <class N, class T>
 class NodeTyped: public T {
 public:
     using T::T;
 
     virtual void runPass(PassBase<> *pass) const {
-        Pass<I>::call(pass, pass->getId(), this);
+        passCall(pass, this);
     }
 
     virtual const std::string &getRuleName() const {

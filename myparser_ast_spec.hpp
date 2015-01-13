@@ -90,20 +90,19 @@ public:
     inline NodeString(
         const Input &input, const Input &end
     ): NodeTextOrError<E>(input, end) {
-        const std::string text(input, end); // TODO: just use iter
         std::ostringstream result;
 
-        for (size_t i = QL; i < text.size() - QR; ++i) {
-            if (text[i] == EC) {
+        for (Input i = input + QL; i < end - QR; ++i) {
+            if (*i == EC) {
                 // escape
 
                 ++i;
-                if (i >= text.size() - 1) {
+                if (i >= end - QR) {
                     succeed = false;
                     return;
                 }
 
-                switch (text[i]) {
+                switch (*i) {
                 case '0':
                     result << '\0';
                     break;
@@ -138,13 +137,13 @@ public:
                     // "\x00"
 
                     i += 2;
-                    if (i >= text.size() - 1) {
+                    if (i >= end - QR) {
                         succeed = false;
                         return;
                     }
 
                     {
-                        char hvalue = hexMap2(text[i - 1], text[i]);
+                        char hvalue = hexMap2(*(i - 1), *i);
                         if (hvalue < 0) {
                             succeed = false;
                             return;
@@ -155,13 +154,13 @@ public:
 
                     break;
                 default:
-                    result << text[i];
+                    result << *i;
                     break;
                 }
             } else {
                 // no escape
 
-                result << text[i];
+                result << *i;
             }
         }
 
