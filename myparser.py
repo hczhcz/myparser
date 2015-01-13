@@ -5,10 +5,10 @@ from myparser_tool import MyParserException
 from myparser_rule import RuleList, RuleBuiltin, RuleRegex
 from myparser_rule import root_name
 
-re_list = re.compile(r'(?<=^)\w([\w ]*\w)?(?=:)')
-re_builtin = re.compile(r'(?<=^\*\*)\w([\w ]*\w)?(?=\*\*:)')
-re_regex = re.compile(r'(?<=^\*)\w([\w ]*\w)?(?=\*:)')
-re_rule = re.compile(r'(?<=^    )(?!\/\/ ).*')
+re_list = re.compile(r'(?<=^)\w([\w ]*\w)?(?=:$)')
+re_builtin = re.compile(r'(?<=^\*\*)\w([\w ]*\w)?(?=\*\*:$)')
+re_regex = re.compile(r'(?<=^\*)\w([\w ]*\w)?(?=\*:$)')
+re_rule = re.compile(r'(?<=^    )(?!\/\/ ).*(?=$)')
 
 
 class MyParser(object):

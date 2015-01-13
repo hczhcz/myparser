@@ -18,6 +18,17 @@ syntax_regex = '*'
 syntax_space = ' '
 syntax_ref_l = '<'
 syntax_ref_r = '>'
+syntax_escape = '\\'
+
+escape_dict = {
+    '0': '\0',
+    'b': '\b',
+    't': '\t',
+    'n': '\n',
+    'v': '\v',
+    'f': '\f',
+    'r': '\r'
+}
 
 re_name = re.compile(r'[\w ]+')
 
@@ -107,10 +118,14 @@ class RuleList(Rule):
         self.rule = list()
 
     def add_space(self):
-        self.rule[-1].append((None, RuleItemSpace()))
+        self.rule[-1].append(
+            (None, RuleItemSpace())
+        )
 
     def add_text(self, newtext):
-        self.rule[-1].append((None, RuleItemKeyword(newtext)))
+        self.rule[-1].append(
+            (None, RuleItemKeyword(newtext))
+        )
 
     def add_ref(self, newtarget):
         if newtarget != ignore_name:
@@ -131,9 +146,20 @@ class RuleList(Rule):
         buf = ''
         mode = 0
         newmode = 0
+        escaped = False
+
+        # mode 1: space
+        # mode 2: keyword
+        # mode 3: ref / error
 
         for char in newline:
-            if mode == 3:
+            if escaped:
+                escaped = False
+                if char in escape_dict:
+                    buf += escape_dict[char]
+                else:
+                    buf += char
+            elif mode == 3:
                 if char == syntax_ref_r:
                     newmode = 0
                 else:
@@ -142,6 +168,9 @@ class RuleList(Rule):
                 newmode = 1
             elif char == syntax_ref_l:
                 newmode = 3
+            elif char == syntax_escape:
+                newmode = 2
+                escaped = True
             else:
                 newmode = 2
                 buf += char
@@ -149,19 +178,19 @@ class RuleList(Rule):
             if newmode != mode:
                 if mode == 1:
                     self.add_space()
-                if mode == 2:
+                elif mode == 2:
                     self.add_text(buf)
                     buf = ''
-                if mode == 3:
+                elif mode == 3:
                     self.add_ref(buf)
                     buf = ''
                 mode = newmode
 
         if mode == 1:
             self.add_space()
-        if mode == 2:
+        elif mode == 2:
             self.add_text(buf)
-        if mode == 3:
+        elif mode == 3:
             raise MyParserException(
                 '"' + syntax_ref_r + '" expected but not found'
             )
