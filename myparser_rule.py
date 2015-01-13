@@ -27,8 +27,14 @@ escape_dict = {
     'n': '\n',
     'v': '\v',
     'f': '\f',
-    'r': '\r'
+    'r': '\r',
+    syntax_space: syntax_space,
+    syntax_ref_l: syntax_ref_l,
+    syntax_ref_r: syntax_ref_r,
+    syntax_escape: syntax_escape
 }
+
+inv_escape_dict = {b: a for a, b in escape_dict.items()}
 
 re_name = re.compile(r'[\w ]+')
 
@@ -60,7 +66,12 @@ class RuleItemKeyword(object):
         self.text = newtext
 
     def dump(self):
-        return self.text
+        return ''.join([
+            (
+                syntax_escape + inv_escape_dict[char]
+                if char in inv_escape_dict else char
+            ) for char in self.text
+        ])
 
     def xdump(self, template):
         return template['keyword'](self.text)
@@ -128,17 +139,18 @@ class RuleList(Rule):
         )
 
     def add_ref(self, newtarget):
-        if newtarget != ignore_name:
-            if newtarget[0] == char_error:
-                self.rule[-1].append(
-                    (newtarget[0], RuleItemError(newtarget[1:]))
-                )
-            elif newtarget[0] in {char_maybe, char_any0, char_any1}:
-                self.rule[-1].append(
-                    (newtarget[0], RuleItemRef(newtarget[1:]))
-                )
-            else:
-                self.rule[-1].append((None, RuleItemRef(newtarget)))
+        if newtarget == ignore_name:
+            self.rule[-1].append((None, None))
+        elif newtarget[0] == char_error:
+            self.rule[-1].append(
+                (newtarget[0], RuleItemError(newtarget[1:]))
+            )
+        elif newtarget[0] in {char_maybe, char_any0, char_any1}:
+            self.rule[-1].append(
+                (newtarget[0], RuleItemRef(newtarget[1:]))
+            )
+        else:
+            self.rule[-1].append((None, RuleItemRef(newtarget)))
 
     def add(self, newline):
         self.rule.append(list())
@@ -201,12 +213,14 @@ class RuleList(Rule):
                 (
                     item[1].dump_tag(item[0])
                     if item[0] else item[1].dump()
+                    if item[1] else syntax_ref_l + syntax_ref_r
                 ) for item in line
             ]) for line in self.rule
         ])
 
     def dump(self):
-        return syntax_list + self.name + syntax_list + syntax_colon\
+        return syntax_list + self.name + syntax_list\
+            + syntax_colon + syntax_return\
             + syntax_return\
             + self.dump_list()\
             + syntax_return
@@ -217,14 +231,16 @@ class RuleList(Rule):
                 (
                     item[1].xdump_tag(template, item[0])
                     if item[0] else item[1].xdump(template)
-                ) for item in line
+                ) for item in line if item[1]
             ]) for line in self.rule
         ])
 
     def compile(self, env):
         self.compiled = [
             [
-                (item[0], item[1].compile(env)) for item in line
+                (
+                    item[0], item[1].compile(env)
+                ) for item in line if item[1]
             ] for line in self.rule
         ]
 
@@ -252,7 +268,8 @@ class RuleBuiltin(RuleList):
             raise MyParserException('Bad builtin rule name')
 
     def dump(self):
-        return syntax_builtin + self.name + syntax_builtin + syntax_colon\
+        return syntax_builtin + self.name + syntax_builtin\
+            + syntax_colon + syntax_return\
             + syntax_return\
             + self.dump_list()\
             + syntax_return
@@ -268,10 +285,11 @@ class RuleRegex(Rule):
         self.regex = newregex
 
     def dump(self):
-        return syntax_regex + self.name + syntax_regex + syntax_colon\
-                            + syntax_return\
-                            + syntax_indent + self.regex\
-                            + syntax_return
+        return syntax_regex + self.name + syntax_regex\
+            + syntax_colon + syntax_return\
+            + syntax_return\
+            + syntax_indent + self.regex\
+            + syntax_return
 
     def xdump(self, template):
         return template['regex'](self.name, self.regex)
