@@ -50,15 +50,15 @@ list body:
 
 list line:
 
-    \ \ \ \ <list items><line break>
+    <indent><list items><line break>
 
 regex line:
 
-    \ \ \ \ <anything><line break>
+    <indent><anything><line break>
 
 comment line:
 
-    \ \ \ \ <>//<anything><line break>
+    <indent>//<anything><line break>
     <other markdown><line break>
     <line break>
 
@@ -99,11 +99,15 @@ error item:
 
 *sign*:
 
-    \**\:?| +|\/\/|<[\*\+?!]?|>
+    \**:|\*+| +|\/\/|<[\*\+\?\!]?|>
 
 *other markdown*:
 
     ( ? ? ?)[^ \r\n].*[^:\r\n]|.|
+
+*indent*:
+
+    (    )
 
 *line break*:
 

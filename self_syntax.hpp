@@ -3,7 +3,7 @@
 #ifndef SELF_SYNTAX_HPP
 #define SELF_SYNTAX_HPP
 
-#include "myparser.hpp"
+#include "./myparser.hpp"
 
 namespace myparser {
 
@@ -116,7 +116,7 @@ template<>
 class RuleDef<MP_STR("list line", 9)>:
 public RuleList<MP_STR("list line", 9),
     RuleLine<
-        RuleItemKeyword<MP_STR("    ", 4)>,
+        RuleItemRef<MP_STR("indent", 6)>,
         RuleItemRef<MP_STR("list items", 10)>,
         RuleItemRef<MP_STR("line break", 10)>
     >
@@ -126,7 +126,7 @@ template<>
 class RuleDef<MP_STR("regex line", 10)>:
 public RuleList<MP_STR("regex line", 10),
     RuleLine<
-        RuleItemKeyword<MP_STR("    ", 4)>,
+        RuleItemRef<MP_STR("indent", 6)>,
         RuleItemRef<MP_STR("anything", 8)>,
         RuleItemRef<MP_STR("line break", 10)>
     >
@@ -136,7 +136,7 @@ template<>
 class RuleDef<MP_STR("comment line", 12)>:
 public RuleList<MP_STR("comment line", 12),
     RuleLine<
-        RuleItemKeyword<MP_STR("    ", 4)>,
+        RuleItemRef<MP_STR("indent", 6)>,
         RuleItemKeyword<MP_STR("//", 2)>,
         RuleItemRef<MP_STR("anything", 8)>,
         RuleItemRef<MP_STR("line break", 10)>
@@ -237,13 +237,19 @@ public RuleRegex<MP_STR("id", 2),
 template<>
 class RuleDef<MP_STR("sign", 4)>:
 public RuleRegex<MP_STR("sign", 4),
-    MP_STR("\\**\\:?| +|\\/\\/|<[\\*\\+?!]?|>", 27)
+    MP_STR("\\**:|\\*+| +|\\/\\/|<[\\*\\+\\?\\!]?|>", 31)
 > {};
 
 template<>
 class RuleDef<MP_STR("other markdown", 14)>:
 public RuleRegex<MP_STR("other markdown", 14),
     MP_STR("( ? ? ?)[^ \\r\\n].*[^:\\r\\n]|.|", 29)
+> {};
+
+template<>
+class RuleDef<MP_STR("indent", 6)>:
+public RuleRegex<MP_STR("indent", 6),
+    MP_STR("(    )", 6)
 > {};
 
 template<>
