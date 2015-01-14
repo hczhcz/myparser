@@ -62,3 +62,7 @@ namespace myparser {
 #endif
 '''
     )
+
+
+def cplusplus_gen_auto(parser, mppath, guard):
+    return cplusplus_gen(parser.xdump(cplusplus_dump), mppath, guard)
