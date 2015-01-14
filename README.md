@@ -3,9 +3,27 @@ MyParser
 
 A parser generator.
 
-`Markdown ===(Python)==> C++11.`
+The workflow: `Markdown ===(Python)==> C++11.`
 
-Input Syntax
+Usage
+---
+
+###Generate a parser in Python
+
+1. Import `myparser` and `myparser_cpp` in python.
+2. Create a parser object: `parser = myparser.MyParser()`.
+3. Load a syntax file: `parser.add_file(filename)`.
+4. Generate the parser: `myparser_cpp.cplusplus_gen_auto(parser, './', 'SYNTAX_HPP')`.
+5. Save the generated code as a C++ header file.
+
+###Use the generated parser
+
+6. Import the generated code and use the namespace `myparser`.
+7. Parse a file: `auto ast = Parser<>::parseFile(filename)`, or a string: `Parser<>::parse(text)`.
+8. Visit the AST via RTTI, or use a visitor `myparser::Pass<>`: `ast->runPass(&pass)`.
+9. Compile your code with `-std=c++11`.
+
+Syntax File
 ---
 
 **root**:
@@ -116,6 +134,10 @@ error item:
 *anything*:
 
     .*
+
+The `README.md` is not only a document but also an example of a syntax file.
+
+See also: `./self_syntax.py` and `self_bootstrap.cpp`.
 
 Example
 ---
