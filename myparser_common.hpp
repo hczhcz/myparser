@@ -27,6 +27,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #if defined(MYPARSER_BOOST_REGEX)
     #include <boost/regex.hpp>

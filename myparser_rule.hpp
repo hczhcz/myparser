@@ -308,7 +308,7 @@ template <class N = BuiltinRoot>
 class Parser {
 public:
     static inline Node<> *parse(
-        Input &input, const Input &end, const bool dothrow = true
+        Input &input, const Input &end, const bool dothrow = false
     ) {
         auto current = RuleDef<N>::parse(input, end);
 
@@ -328,11 +328,24 @@ public:
     }
 
     static inline Node<> *parse(
-        const std::string &text, const bool dothrow = true
+        const std::string &text, const bool dothrow = false
     ) {
         Input input = text.cbegin();
 
         return parse(input, text.cend(), dothrow);
+    }
+
+    static inline Node<> *parseFile(
+        const std::string &filename, const bool dothrow = false
+    ) {
+        static std::vector<std::string> storage;
+
+        std::ifstream fs(filename);
+        std::istreambuf_iterator<char> input(fs);
+        std::istreambuf_iterator<char> end;
+        storage.push_back(std::string(input, end));
+
+        return parse(storage.back(), dothrow);
     }
 };
 
