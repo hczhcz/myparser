@@ -71,3 +71,101 @@ class MyParser(object):
             return result
         else:
             raise MyParserException('Match nothing')
+
+
+if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) <= 1 or sys.argv[1] == 'help':
+        # show help
+
+        print '============================================='
+        print ' MyParser: a lightweight LL parser framework '
+        print '============================================='
+        print ''
+        print 'Usage: ' + __file__ + ' command arguments'
+        print ''
+        print __file__ + ' help'
+        print '    Show help'
+        print ''
+        print __file__ + ' print SYNTAX'
+        print '    Process syntax file and print out'
+        print ''
+        # print __file__ + ' match SYNTAX [-i INPUT] [-o OUTPUT]'
+        # print '    ???'
+        # print ''
+        print __file__ + ' c++ SYNTAX [-o OUTPUT] [-p HEADER_PATH] [-g GUARD]'
+        print '    Run the c++ code generator'
+        print ''
+
+    elif sys.argv[1] == 'print':
+        # dump
+
+        index = 2
+
+        syntax = ''
+
+        while index < len(sys.argv):
+            if sys.argv[index][:1] == '-':
+                raise MyParserException('Unknown argument')
+            else:
+                syntax = sys.argv[index]
+            index += 1
+
+        if not os.path.isfile(syntax):
+            raise MyParserException('File not found')
+
+        parser = MyParser()
+        parser.add_file(syntax)
+
+        print parser.dump()
+
+    elif sys.argv[1] == 'c++':
+        # c++ code generator
+
+        import myparser_cpp
+
+        index = 2
+
+        syntax = ''
+        output = ''
+        mppath = ''
+        guard = 'MP_SYNTAX_HPP'
+
+        while index < len(sys.argv):
+            if sys.argv[index][:1] == '-':
+                if sys.argv[index] == '-o':
+                    index += 1
+                    if index < len(sys.argv):
+                        output = sys.argv[index]
+                elif sys.argv[index] == '-p':
+                    index += 1
+                    if index < len(sys.argv):
+                        mppath = sys.argv[index]
+                elif sys.argv[index] == '-g':
+                    index += 1
+                    if index < len(sys.argv):
+                        guard = sys.argv[index]
+                else:
+                    raise MyParserException('Unknown argument')
+            else:
+                syntax = sys.argv[index]
+            index += 1
+
+        if not os.path.isfile(syntax):
+            raise MyParserException('File not found')
+
+        parser = MyParser()
+        parser.add_file(syntax)
+
+        result = myparser_cpp.cplusplus_gen_auto(
+            parser, mppath, guard
+        )
+
+        if output == '':
+            print result
+        else:
+            open(output, 'w').write(result)
+
+    else:
+        raise MyParserException('Unknown command')

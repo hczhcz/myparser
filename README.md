@@ -16,6 +16,8 @@ Usage
 4. Generate the parser: `myparser_cpp.cplusplus_gen_auto(parser, './', 'SYNTAX_HPP')`.
 5. Save the generated code as a C++ header file.
 
+Or just run `myparser.py c++ <filename>`.
+
 ###Use the generated parser
 
 6. Import the generated code and use the namespace `myparser`.
