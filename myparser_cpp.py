@@ -6,7 +6,7 @@ from myparser_tool import char_maybe, char_any0, char_any1
 def str_gen(value):
     result = value.encode('string_escape').replace('"', r'\"')
 
-    return 'MP_STR("' + result + '", ' + str(len(value)) + ')'
+    return 'MP_STR("' + result + '")'
 
 
 indent0 = os.linesep

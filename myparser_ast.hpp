@@ -7,10 +7,10 @@ namespace myparser {
 
 using Input = std::string::const_iterator;
 
-using BuiltinRoot = MP_STR("root", 4);
-using BuiltinSpace = MP_STR("space", 5);
-using BuiltinKeyword = MP_STR("keyword", 7);
-using BuiltinError = MP_STR("error", 5);
+using BuiltinRoot = MP_STR("root");
+using BuiltinSpace = MP_STR("space");
+using BuiltinKeyword = MP_STR("keyword");
+using BuiltinError = MP_STR("error");
 
 template <class TX = void> // actually not a template
 class Node {

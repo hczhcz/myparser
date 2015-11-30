@@ -7,260 +7,260 @@
 namespace myparser {
 
 template<>
-class RuleDef<MP_STR("root", 4)>:
-public RuleList<MP_STR("root", 4),
+class RuleDef<MP_STR("root")>:
+public RuleList<MP_STR("root"),
     RuleLine<
         RuleItemSpace<>,
-        RuleItemRef<MP_STR("blocks", 6)>,
+        RuleItemRef<MP_STR("blocks")>,
         RuleItemSpace<>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("space", 5)>:
-public RuleList<MP_STR("space", 5),
+class RuleDef<MP_STR("space")>:
+public RuleList<MP_STR("space"),
     RuleLine<
-        RuleItemRef<MP_STR("comment line", 12), TagAny0>
+        RuleItemRef<MP_STR("comment line"), TagAny0>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("keyword", 7)>:
-public RuleList<MP_STR("keyword", 7),
+class RuleDef<MP_STR("keyword")>:
+public RuleList<MP_STR("keyword"),
     RuleLine<
-        RuleItemRef<MP_STR("id", 2)>
+        RuleItemRef<MP_STR("id")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("sign", 4)>
+        RuleItemRef<MP_STR("sign")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("blocks", 6)>:
-public RuleList<MP_STR("blocks", 6),
+class RuleDef<MP_STR("blocks")>:
+public RuleList<MP_STR("blocks"),
     RuleLine<
-        RuleItemRef<MP_STR("block", 5), TagAny1>
+        RuleItemRef<MP_STR("block"), TagAny1>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("block", 5)>:
-public RuleList<MP_STR("block", 5),
+class RuleDef<MP_STR("block")>:
+public RuleList<MP_STR("block"),
     RuleLine<
-        RuleItemRef<MP_STR("list head", 9)>,
+        RuleItemRef<MP_STR("list head")>,
         RuleItemSpace<>,
-        RuleItemRef<MP_STR("list body", 9)>,
+        RuleItemRef<MP_STR("list body")>,
         RuleItemSpace<>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("builtin head", 12)>,
+        RuleItemRef<MP_STR("builtin head")>,
         RuleItemSpace<>,
-        RuleItemRef<MP_STR("list body", 9)>,
+        RuleItemRef<MP_STR("list body")>,
         RuleItemSpace<>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("regex head", 10)>,
+        RuleItemRef<MP_STR("regex head")>,
         RuleItemSpace<>,
-        RuleItemRef<MP_STR("regex line", 10)>,
+        RuleItemRef<MP_STR("regex line")>,
         RuleItemSpace<>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("list head", 9)>:
-public RuleList<MP_STR("list head", 9),
+class RuleDef<MP_STR("list head")>:
+public RuleList<MP_STR("list head"),
     RuleLine<
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR(":", 1)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR(":")>,
+        RuleItemRef<MP_STR("line break")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("builtin head", 12)>:
-public RuleList<MP_STR("builtin head", 12),
+class RuleDef<MP_STR("builtin head")>:
+public RuleList<MP_STR("builtin head"),
     RuleLine<
-        RuleItemKeyword<MP_STR("**", 2)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR("**:", 3)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemKeyword<MP_STR("**")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR("**:")>,
+        RuleItemRef<MP_STR("line break")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("regex head", 10)>:
-public RuleList<MP_STR("regex head", 10),
+class RuleDef<MP_STR("regex head")>:
+public RuleList<MP_STR("regex head"),
     RuleLine<
-        RuleItemKeyword<MP_STR("*", 1)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR("*:", 2)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemKeyword<MP_STR("*")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR("*:")>,
+        RuleItemRef<MP_STR("line break")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("list body", 9)>:
-public RuleList<MP_STR("list body", 9),
+class RuleDef<MP_STR("list body")>:
+public RuleList<MP_STR("list body"),
     RuleLine<
-        RuleItemRef<MP_STR("list line", 9)>,
+        RuleItemRef<MP_STR("list line")>,
         RuleItemSpace<>,
-        RuleItemRef<MP_STR("list body", 9)>
+        RuleItemRef<MP_STR("list body")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("list line", 9)>
+        RuleItemRef<MP_STR("list line")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("list line", 9)>:
-public RuleList<MP_STR("list line", 9),
+class RuleDef<MP_STR("list line")>:
+public RuleList<MP_STR("list line"),
     RuleLine<
-        RuleItemRef<MP_STR("indent", 6)>,
-        RuleItemRef<MP_STR("list items", 10)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemRef<MP_STR("indent")>,
+        RuleItemRef<MP_STR("list items")>,
+        RuleItemRef<MP_STR("line break")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("regex line", 10)>:
-public RuleList<MP_STR("regex line", 10),
+class RuleDef<MP_STR("regex line")>:
+public RuleList<MP_STR("regex line"),
     RuleLine<
-        RuleItemRef<MP_STR("indent", 6)>,
-        RuleItemRef<MP_STR("anything", 8)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemRef<MP_STR("indent")>,
+        RuleItemRef<MP_STR("anything")>,
+        RuleItemRef<MP_STR("line break")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("comment line", 12)>:
-public RuleList<MP_STR("comment line", 12),
+class RuleDef<MP_STR("comment line")>:
+public RuleList<MP_STR("comment line"),
     RuleLine<
-        RuleItemRef<MP_STR("indent", 6)>,
-        RuleItemKeyword<MP_STR("//", 2)>,
-        RuleItemRef<MP_STR("anything", 8)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemRef<MP_STR("indent")>,
+        RuleItemKeyword<MP_STR("//")>,
+        RuleItemRef<MP_STR("anything")>,
+        RuleItemRef<MP_STR("line break")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("other markdown", 14)>,
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemRef<MP_STR("other markdown")>,
+        RuleItemRef<MP_STR("line break")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("line break", 10)>
+        RuleItemRef<MP_STR("line break")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("list items", 10)>:
-public RuleList<MP_STR("list items", 10),
+class RuleDef<MP_STR("list items")>:
+public RuleList<MP_STR("list items"),
     RuleLine<
-        RuleItemRef<MP_STR("list item", 9), TagAny0>
+        RuleItemRef<MP_STR("list item"), TagAny0>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("list item", 9)>:
-public RuleList<MP_STR("list item", 9),
+class RuleDef<MP_STR("list item")>:
+public RuleList<MP_STR("list item"),
     RuleLine<
-        RuleItemKeyword<MP_STR(" ", 1)>
+        RuleItemKeyword<MP_STR(" ")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("empty item", 10)>
+        RuleItemRef<MP_STR("empty item")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("keyword item", 12)>
+        RuleItemRef<MP_STR("keyword item")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("ref item", 8)>
+        RuleItemRef<MP_STR("ref item")>
     >,
     RuleLine<
-        RuleItemRef<MP_STR("error item", 10)>
+        RuleItemRef<MP_STR("error item")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("empty item", 10)>:
-public RuleList<MP_STR("empty item", 10),
+class RuleDef<MP_STR("empty item")>:
+public RuleList<MP_STR("empty item"),
     RuleLine<
-        RuleItemKeyword<MP_STR("<", 1)>,
-        RuleItemKeyword<MP_STR(">", 1)>
+        RuleItemKeyword<MP_STR("<")>,
+        RuleItemKeyword<MP_STR(">")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("keyword item", 12)>:
-public RuleRegex<MP_STR("keyword item", 12),
-    MP_STR("([^ \\r\\n\\\\<]|\\\\.)+", 18)
+class RuleDef<MP_STR("keyword item")>:
+public RuleRegex<MP_STR("keyword item"),
+    MP_STR("([^ \\r\\n\\\\<]|\\\\.)+")
 > {};
 
 template<>
-class RuleDef<MP_STR("ref item", 8)>:
-public RuleList<MP_STR("ref item", 8),
+class RuleDef<MP_STR("ref item")>:
+public RuleList<MP_STR("ref item"),
     RuleLine<
-        RuleItemKeyword<MP_STR("<", 1)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR(">", 1)>
+        RuleItemKeyword<MP_STR("<")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR(">")>
     >,
     RuleLine<
-        RuleItemKeyword<MP_STR("<?", 2)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR(">", 1)>
+        RuleItemKeyword<MP_STR("<?")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR(">")>
     >,
     RuleLine<
-        RuleItemKeyword<MP_STR("<*", 2)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR(">", 1)>
+        RuleItemKeyword<MP_STR("<*")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR(">")>
     >,
     RuleLine<
-        RuleItemKeyword<MP_STR("<+", 2)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR(">", 1)>
+        RuleItemKeyword<MP_STR("<+")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR(">")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("error item", 10)>:
-public RuleList<MP_STR("error item", 10),
+class RuleDef<MP_STR("error item")>:
+public RuleList<MP_STR("error item"),
     RuleLine<
-        RuleItemKeyword<MP_STR("<!", 2)>,
-        RuleItemRef<MP_STR("id", 2)>,
-        RuleItemKeyword<MP_STR(">", 1)>
+        RuleItemKeyword<MP_STR("<!")>,
+        RuleItemRef<MP_STR("id")>,
+        RuleItemKeyword<MP_STR(">")>
     >
 > {};
 
 template<>
-class RuleDef<MP_STR("id", 2)>:
-public RuleRegex<MP_STR("id", 2),
-    MP_STR("\\w([\\w ]*\\w)?", 13)
+class RuleDef<MP_STR("id")>:
+public RuleRegex<MP_STR("id"),
+    MP_STR("\\w([\\w ]*\\w)?")
 > {};
 
 template<>
-class RuleDef<MP_STR("sign", 4)>:
-public RuleRegex<MP_STR("sign", 4),
-    MP_STR("\\**:|\\*+| +|\\/\\/|<[\\*\\+\\?\\!]?|>", 31)
+class RuleDef<MP_STR("sign")>:
+public RuleRegex<MP_STR("sign"),
+    MP_STR("\\**:|\\*+| +|\\/\\/|<[\\*\\+\\?\\!]?|>")
 > {};
 
 template<>
-class RuleDef<MP_STR("other markdown", 14)>:
-public RuleRegex<MP_STR("other markdown", 14),
-    MP_STR("( ? ? ?)[^ \\r\\n].*[^:\\r\\n]|.|", 29)
+class RuleDef<MP_STR("other markdown")>:
+public RuleRegex<MP_STR("other markdown"),
+    MP_STR("( ? ? ?)[^ \\r\\n].*[^:\\r\\n]|.|")
 > {};
 
 template<>
-class RuleDef<MP_STR("indent", 6)>:
-public RuleRegex<MP_STR("indent", 6),
-    MP_STR("(    )", 6)
+class RuleDef<MP_STR("indent")>:
+public RuleRegex<MP_STR("indent"),
+    MP_STR("(    )")
 > {};
 
 template<>
-class RuleDef<MP_STR("line break", 10)>:
-public RuleRegex<MP_STR("line break", 10),
-    MP_STR("[\\r\\n]+", 7)
+class RuleDef<MP_STR("line break")>:
+public RuleRegex<MP_STR("line break"),
+    MP_STR("[\\r\\n]+")
 > {};
 
 template<>
-class RuleDef<MP_STR("anything", 8)>:
-public RuleRegex<MP_STR("anything", 8),
-    MP_STR(".*", 2)
+class RuleDef<MP_STR("anything")>:
+public RuleRegex<MP_STR("anything"),
+    MP_STR(".*")
 > {};
 
 
