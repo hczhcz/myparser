@@ -80,9 +80,7 @@ public:
     }
 
     template <class E>
-    void run(const NodeError<E> *node) {
-        (void) node;
-    }
+    void run(const NodeError<E> *) {}
 };
 
 template <class TX = void> // actually not a template

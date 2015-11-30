@@ -72,10 +72,8 @@ private:
 
     template <size_t I> // iteration finished
     static MYPARSER_INLINE std::pair<Node<> *, Node<> *> runRule(
-        Input &input, const Input &end
+        Input &input, const Input &
     ) {
-        (void) end;
-
         return {
             nullptr,
             new NodeTypedError<N, ErrorList>(input)
@@ -201,10 +199,8 @@ template <class E, class TAG = TagNormal>
 class RuleItemError: public TAG {
 public:
     static MYPARSER_INLINE std::pair<Node<> *, Node<> *> parse(
-        Input &input, const Input &end
+        Input &input, const Input &
     ) {
-        (void) end;
-
         return {
             nullptr,
             new NodeTypedError<BuiltinError, E>(input)
@@ -256,15 +252,9 @@ public:
 
         template <std::nullptr_t P = nullptr> // iteration finished
         static MYPARSER_INLINE bool runRule(
-            Result *&result, Node<> *&err, size_t &errpos,
-            Input &input, const Input &end
+            Result *&, Node<> *&, size_t &,
+            Input &, const Input &
         ) {
-            (void) result;
-            (void) err;
-            (void) errpos;
-            (void) input;
-            (void) end;
-
             return true;
         }
 

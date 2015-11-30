@@ -60,7 +60,7 @@ namespace myparser {
     }
 #else
     template <class T>
-    inline void mpDebug(T value) {}
+    inline void mpDebug(T) {}
 #endif
 
 #if defined(MYPARSER_AST_CCC)

@@ -47,12 +47,9 @@ class Pass<PASS_FIN> {
 public:
     template <class T>
     static MYPARSER_INLINE void call(
-        PassBase<> *pass, const size_t target, const T *node
+        PassBase<> *, const size_t , const T *
     ) {
         // never reach
-        (void) pass;
-        (void) target;
-        (void) node;
         throw;
     }
 };

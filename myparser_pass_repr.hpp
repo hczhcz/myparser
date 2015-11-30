@@ -14,29 +14,17 @@ protected:
     std::ostream &out;
     size_t indent;
 
-    virtual void putName(const std::string &name) {
-        (void) name;
-    }
+    virtual void putName(const std::string &) {}
 
-    virtual void putIndex(const size_t index) {
-        (void) index;
-    }
+    virtual void putIndex(const size_t) {}
 
-    virtual void putText(const std::string &text) {
-        (void) text;
-    }
+    virtual void putText(const std::string &) {}
 
-    virtual void putSpace(const std::string &text) {
-        (void) text;
-    }
+    virtual void putSpace(const std::string &) {}
 
-    virtual void putKeyword(const std::string &text) {
-        (void) text;
-    }
+    virtual void putKeyword(const std::string &) {}
 
-    virtual void putError(const std::string &error) {
-        (void) error;
-    }
+    virtual void putError(const std::string &) {}
 
     virtual void putMainBegin() {}
 
@@ -52,9 +40,7 @@ protected:
 
     virtual void putLnEnd() {}
 
-    virtual void putLn(const bool first) {
-        (void) first;
-    }
+    virtual void putLn(const bool) {}
 
 public:
     inline Pass(
@@ -231,9 +217,7 @@ protected:
         out << "=>";
     }
 
-    virtual void putLn(const bool first) {
-        (void) first;
-
+    virtual void putLn(const bool) {
         out << '\n';
         for (size_t i = 0; i < indent; ++i) {
             out << "    ";
@@ -282,9 +266,7 @@ protected:
         out << style_space << " - " << style_normal;
     }
 
-    virtual void putLn(const bool first) {
-        (void) first;
-
+    virtual void putLn(const bool) {
         out << '\n';
         for (size_t i = 0; i < indent; ++i) {
             out << "    ";
