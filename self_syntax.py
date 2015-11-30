@@ -9,6 +9,6 @@ print parser.dump()
 with open('self_syntax.hpp', 'w') as syntax_hpp:
     syntax_hpp.write(
         myparser_cpp.cplusplus_gen_auto(
-            parser, './', 'SELF_SYNTAX_HPP'
+            parser, './'
         )
     )

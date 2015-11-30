@@ -1,5 +1,4 @@
-#ifndef MYPARSER_AST_HPP
-#define MYPARSER_AST_HPP
+#pragma once
 
 #include "myparser_str.hpp"
 #include "myparser_pass.hpp"
@@ -241,5 +240,3 @@ template <class N, class E>
 using NodeTypedError = NodeTyped<N, typename NodeBaseError<N>::template Type<E>>;
 
 }
-
-#endif

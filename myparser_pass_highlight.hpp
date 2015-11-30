@@ -1,5 +1,4 @@
-#ifndef MYPARSER_PASS_HIGHLIGHT_HPP
-#define MYPARSER_PASS_HIGHLIGHT_HPP
+#pragma once
 
 #include "myparser_ast_spec.hpp"
 
@@ -114,5 +113,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef CCC_HPP
-#define CCC_HPP
+#pragma once
 
 #include <iostream>
 
@@ -121,5 +120,3 @@ inline std::ostream &operator<<(std::ostream &s, const alsoStyle<T> &target) {
 }
 
 }
-
-#endif

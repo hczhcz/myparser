@@ -1,5 +1,4 @@
-#ifndef MYPARSER_RULE_HPP
-#define MYPARSER_RULE_HPP
+#pragma once
 
 #include "myparser_ast_spec.hpp"
 
@@ -350,5 +349,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MYPARSER_STR_HPP
-#define MYPARSER_STR_HPP
+#pragma once
 
 #include "myparser_common.hpp"
 
@@ -26,5 +25,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MYPARSER_PASS_HPP
-#define MYPARSER_PASS_HPP
+#pragma once
 
 #include "myparser_common.hpp"
 
@@ -66,5 +65,3 @@ void passCall(
 }
 
 }
-
-#endif

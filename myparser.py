@@ -94,7 +94,7 @@ if __name__ == '__main__':
         # print __file__ + ' match SYNTAX [-i INPUT] [-o OUTPUT]'
         # print '    ???'
         # print ''
-        print __file__ + ' c++ SYNTAX [-o OUTPUT] [-p HEADER_PATH] [-g GUARD]'
+        print __file__ + ' c++ SYNTAX [-o OUTPUT] [-p HEADER_PATH]'
         print '    Run the c++ code generator'
         print ''
 
@@ -130,7 +130,6 @@ if __name__ == '__main__':
         syntax = ''
         output = ''
         mppath = ''
-        guard = 'MP_SYNTAX_HPP'
 
         while index < len(sys.argv):
             if sys.argv[index][:1] == '-':
@@ -142,10 +141,6 @@ if __name__ == '__main__':
                     index += 1
                     if index < len(sys.argv):
                         mppath = sys.argv[index]
-                elif sys.argv[index] == '-g':
-                    index += 1
-                    if index < len(sys.argv):
-                        guard = sys.argv[index]
                 else:
                     raise MyParserException('Unknown argument')
             else:
@@ -159,7 +154,7 @@ if __name__ == '__main__':
         parser.add_file(syntax)
 
         result = myparser_cpp.cplusplus_gen_auto(
-            parser, mppath, guard
+            parser, mppath
         )
 
         if output == '':

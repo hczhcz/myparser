@@ -1,5 +1,4 @@
-#ifndef MYPARSER_COMMON_HPP
-#define MYPARSER_COMMON_HPP
+#pragma once
 
 // option list
 
@@ -99,5 +98,3 @@ template <size_t>
 class Pass;
 
 }
-
-#endif

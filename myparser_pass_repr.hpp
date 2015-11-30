@@ -1,5 +1,4 @@
-#ifndef MYPARSER_PASS_REPR_HPP
-#define MYPARSER_PASS_REPR_HPP
+#pragma once
 
 #include "myparser_ast_spec.hpp"
 
@@ -435,5 +434,3 @@ public:
 };
 
 }
-
-#endif
