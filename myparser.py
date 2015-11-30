@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
         syntax = ''
         output = ''
-        mppath = ''
+        mppath = './'
 
         while index < len(sys.argv):
             if sys.argv[index][:1] == '-':
