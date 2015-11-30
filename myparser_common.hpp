@@ -3,19 +3,12 @@
 // option list
 
 #if !defined(MYPARSER_CUSTOMIZED)
-    #define MYPARSER_DEBUG
     #define MYPARSER_AST_CCC
 
     #if defined(__GNUC__) || defined(__clang__)
         #define MYPARSER_FORCE_INLINE
     #endif
 
-    // use boost instead of libstdc++
-    // #if defined(__GLIBCXX__)
-    //     #define MYPARSER_BOOST_XPRESSIVE
-    // #else
-    //     #define MYPARSER_STD_REGEX
-    // #endif
     #define MYPARSER_STD_REGEX
 #endif
 

@@ -1,6 +1,5 @@
 #if 0
-python self_syntax.py &&
-clang++ -std=c++11 -ferror-limit=1 self_bootstrap.cpp -o self_bootstrap.out &&
+clang++ -std=c++11 -Wall -Wextra -ferror-limit=1 self_bootstrap.cpp -o self_bootstrap.out &&
 ./self_bootstrap.out
 
 exit
